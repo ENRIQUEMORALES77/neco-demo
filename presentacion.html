@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="color-scheme" content="light">
+  <title>Neco Buffet · Modo presentación</title>
+  <link rel="icon" type="image/png" href="img/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;1,500&display=swap">
+  <style>
+    :root {
+      --verde: #6E8273; --verde-osc: #4F6154; --verde-claro: #E7EDE8;
+      --crema: #FAF7F2; --crema-2: #F3EDE3; --papel: #fff;
+      --tinta: #1E1E1C; --tinta-2: #55534E; --tinta-3: #85827B; --borde: #E6DFD3;
+      --terracota: #C8623E; --terracota-claro: #FBEDE6; --oro: #F2B01E;
+      --serif: "Lora", Georgia, serif;
+      --sans: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0; background: var(--crema); color: var(--tinta); font: 15px/1.45 var(--sans);
+      display: grid; grid-template-rows: auto 1fr auto; overflow: hidden;
+    }
+    button, input { font: inherit; color: inherit; }
+
+    /* ---------- cabecera ---------- */
+    .cab {
+      display: flex; align-items: center; gap: 18px; flex-wrap: wrap;
+      padding: 12px 24px; background: var(--papel); border-bottom: 1px solid var(--borde);
+    }
+    .cab-marca { display: flex; align-items: center; gap: 14px; margin-right: auto; }
+    .cab-marca img { height: 24px; }
+    .cab-marca span { padding-left: 14px; border-left: 1px solid var(--borde); font-weight: 600; color: var(--tinta-2); }
+    .locales { display: flex; gap: 6px; flex-wrap: wrap; }
+    .locales button, .boton-icono {
+      min-height: 38px; padding: 7px 14px; border-radius: 999px; border: 1.5px solid var(--borde);
+      background: var(--papel); font-weight: 600; font-size: 14px; color: var(--tinta-2); cursor: pointer;
+    }
+    .locales button[aria-pressed="true"] { background: var(--verde-osc); border-color: var(--verde-osc); color: #fff; }
+    .locales kbd { font: 600 10px/1 var(--sans); opacity: .55; margin-left: 4px; }
+    .mesa-ctl { display: flex; align-items: center; gap: 6px; font-size: 13.5px; font-weight: 600; color: var(--tinta-2); }
+    .mesa-ctl input { width: 64px; min-height: 38px; padding: 6px 10px; border: 1.5px solid var(--borde); border-radius: 10px; }
+    .boton-icono { padding: 7px 12px; }
+
+    /* ---------- escenario ---------- */
+    .escenario {
+      display: grid; grid-template-columns: auto minmax(340px, 1fr) minmax(0, 1.35fr);
+      gap: 28px; padding: 22px 26px; min-height: 0;
+    }
+    .col { min-height: 0; display: flex; flex-direction: column; }
+    .etq-col {
+      font-size: 12px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--tinta-3);
+      margin: 0 0 10px; display: flex; align-items: center; gap: 8px;
+    }
+    .etq-col a { margin-left: auto; text-transform: none; letter-spacing: 0; font-weight: 600; color: var(--verde-osc); font-size: 13px; }
+
+    /* móvil simulado */
+    .movil-cont { flex: 1; min-height: 0; display: flex; align-items: flex-start; justify-content: center; }
+    .movil {
+      position: relative; padding: 11px; border-radius: calc(54px * var(--s, 1) + 11px);
+      background: #1B1D1B; box-shadow: 0 30px 60px -20px rgba(30, 30, 20, .45), inset 0 0 0 2px #3A3D3A;
+    }
+    .movil::before {
+      content: ""; position: absolute; z-index: 2; top: calc(11px + 10px * var(--s, 1)); left: 50%; transform: translateX(-50%);
+      width: calc(110px * var(--s, 1)); height: calc(30px * var(--s, 1)); border-radius: 99px; background: #1B1D1B;
+    }
+    .pantalla { overflow: hidden; border-radius: calc(46px * var(--s, 1)); background: var(--crema); }
+    .pantalla iframe { display: block; width: 390px; height: 844px; border: 0; transform-origin: 0 0; }
+
+    /* centro */
+    .centro { justify-content: safe center; align-items: center; text-align: center; gap: 0; overflow: auto; }
+    .kicker { margin: 0; font-size: 13px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--terracota); }
+    .centro h1 { font: 600 clamp(24px, 2.3vw, 34px)/1.12 var(--serif); margin: 4px 0 12px; letter-spacing: -.01em; }
+    .qr-caja {
+      position: relative; background: var(--papel); padding: 14px; border-radius: 24px;
+      box-shadow: 0 18px 40px -18px rgba(40, 30, 10, .35); border: 1px solid var(--borde);
+    }
+    .qr-caja svg { display: block; width: clamp(150px, 23vh, 270px); height: auto; }
+    .qr-logo {
+      position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+      width: 22%; aspect-ratio: 1; border-radius: 18%; background: #fff; padding: 4%;
+    }
+    .qr-logo img { width: 100%; height: 100%; border-radius: 16%; display: block; }
+    .estado-url { margin: 12px 0 0; font-size: 13px; color: var(--tinta-3); display: flex; align-items: center; justify-content: center; gap: 7px; flex-wrap: wrap; }
+    .estado-url code { font: 12px ui-monospace, Consolas, monospace; color: var(--tinta-2); }
+    .punto { width: 9px; height: 9px; border-radius: 50%; background: #C9C3B7; flex: none; }
+    .punto.ok { background: #3FA36A; } .punto.ko { background: #E0A13A; }
+    .aviso-url { margin: 6px auto 0; max-width: 440px; padding: 6px 12px; border-radius: 12px; background: #FFF1D6; color: #8A5300; font-size: 13px; }
+
+    .nota-google {
+      display: inline-flex; align-items: center; gap: 10px; margin: 12px 0 0; padding: 8px 16px 8px 10px;
+      border-radius: 999px; background: var(--papel); border: 1px solid var(--borde); font-size: 14px;
+    }
+    .nota-google .g { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; background: var(--crema); }
+    .nota-google .g svg { width: 16px; height: 16px; }
+    .nota-google b { font-size: 16px; }
+    .nota-google .est { color: var(--oro); letter-spacing: 1px; }
+
+    .pasos { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 8px; text-align: left; width: min(100%, 440px); }
+    .pasos li { display: flex; gap: 12px; align-items: flex-start; background: var(--papel); border: 1px solid var(--borde); border-radius: 14px; padding: 8px 12px; }
+    .pasos .n {
+      flex: none; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center;
+      background: var(--verde-osc); color: #fff; font-weight: 800; font-size: 13px;
+    }
+    .pasos strong { display: block; font-size: 14.5px; }
+    .pasos span { font-size: 13px; color: var(--tinta-3); }
+    .pasos li.google { border-color: #CFDCD2; background: var(--verde-claro); }
+
+    .destinos { margin: 10px 0 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; width: min(100%, 440px); }
+    .destino { border-radius: 12px; padding: 9px 8px; font-size: 12.5px; line-height: 1.35; background: var(--crema-2); color: var(--tinta-2); }
+    .destino b { display: block; font-size: 13px; color: var(--tinta); }
+    .destino.pub { background: var(--verde-osc); color: #E4ECE6; }
+    .destino.pub b { color: #fff; }
+
+    /* panel del gerente */
+    .marco-panel {
+      flex: 1; min-height: 0; position: relative; overflow: hidden; border-radius: 18px;
+      background: var(--crema); border: 1px solid var(--borde); box-shadow: 0 18px 40px -24px rgba(40, 30, 10, .35);
+    }
+    .marco-panel iframe { position: absolute; left: 0; top: 0; width: 1280px; border: 0; transform-origin: 0 0; }
+
+    .pie { padding: 8px 24px 12px; font-size: 12px; color: var(--tinta-3); display: flex; justify-content: space-between; gap: 12px; }
+
+    /* ajustes */
+    dialog { border: 0; border-radius: 18px; padding: 22px; width: min(92vw, 520px); box-shadow: 0 30px 80px rgba(0,0,0,.25); }
+    dialog::backdrop { background: rgba(20, 20, 15, .4); }
+    dialog h2 { font: 600 20px/1.2 var(--serif); margin: 0 0 6px; }
+    dialog p { margin: 0 0 12px; font-size: 14px; color: var(--tinta-2); }
+    dialog input { width: 100%; min-height: 44px; padding: 10px 12px; border: 1.5px solid var(--borde); border-radius: 12px; font-size: 15px; }
+    dialog .acciones { display: flex; gap: 8px; justify-content: flex-end; margin-top: 14px; }
+    dialog button { min-height: 40px; padding: 8px 16px; border-radius: 10px; border: 0; font-weight: 700; cursor: pointer; background: var(--crema-2); }
+    dialog button.prim { background: var(--verde-osc); color: #fff; }
+
+    @media (max-height: 860px) {
+      .pasos span { display: none; }
+      .qr-caja svg { width: clamp(140px, 21vh, 220px); }
+      .centro h1 { margin-bottom: 8px; }
+      .pasos li { align-items: center; }
+      .escenario { padding-top: 14px; padding-bottom: 14px; }
+    }
+    @media (max-height: 800px) { .kicker { display: none; } }
+    @media (max-width: 1180px) {
+      .escenario { grid-template-columns: auto minmax(320px, 1fr); }
+      .col-panel { display: none; }
+    }
+    @media (max-width: 760px) {
+      body { overflow: auto; height: auto; }
+      .escenario { grid-template-columns: 1fr; }
+      .col-movil { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="cab">
+    <div class="cab-marca"><img src="img/logo-neco.png" alt="Neco Buffet"><span>Placas NFC de reseñas · Demo</span></div>
+    <div class="locales" id="locales" role="group" aria-label="Local"></div>
+    <label class="mesa-ctl">Mesa <input type="number" id="mesa" min="1" value="12"></label>
+    <button class="boton-icono" id="ajustes" type="button" title="URL del QR">⚙ URL del QR</button>
+    <button class="boton-icono" id="completa" type="button" title="Pantalla completa (F)">⛶ Pantalla completa</button>
+  </header>
+
+  <main class="escenario">
+    <section class="col col-movil">
+      <p class="etq-col">Lo que ve el cliente</p>
+      <div class="movil-cont" id="movil-cont">
+        <div class="movil" id="movil"><div class="pantalla" id="pantalla"><iframe id="f-movil" title="Página del cliente"></iframe></div></div>
+      </div>
+    </section>
+
+    <section class="col centro">
+      <p class="kicker">Pruébalo ahora con tu móvil</p>
+      <h1 id="titulo">Escanea y deja tu reseña</h1>
+      <div class="qr-caja"><div id="qr"></div><div class="qr-logo"><img src="img/apple-touch-icon.png" alt=""></div></div>
+      <p class="estado-url"><span class="punto" id="punto"></span><code id="url-texto"></code></p>
+      <div id="aviso-url"></div>
+
+      <div class="nota-google" id="nota-google"></div>
+
+      <ol class="pasos">
+        <li><span class="n">1</span><div><strong>Acerca el móvil a la placa o escanea el QR</strong><span>Sin descargar nada. Se abre la página del local y la mesa.</span></div></li>
+        <li class="google"><span class="n">2</span><div><strong>Pulsa «Déjanos tu reseña en Google»</strong><span>Se abre Google Maps con las estrellas listas para valorar.</span></div></li>
+        <li><span class="n">3</span><div><strong>La reseña se publica en Google Maps</strong><span id="paso3">En la ficha del local, donde busca la gente.</span></div></li>
+      </ol>
+
+      <div class="destinos">
+        <div class="destino pub"><b>⭐ Reseña</b>Pública en Google Maps</div>
+        <div class="destino"><b>💬 Mensaje</b>Privado, solo para el gerente</div>
+        <div class="destino"><b>🎉 Grupo</b>Al responsable de eventos</div>
+      </div>
+    </section>
+
+    <section class="col col-panel">
+      <p class="etq-col">Lo que ve el gerente <a href="panel.html" target="_blank" rel="noopener">Abrir panel completo ↗</a></p>
+      <div class="marco-panel" id="marco-panel"><iframe id="f-panel" src="panel.html" title="Panel de gestión"></iframe></div>
+    </section>
+  </main>
+
+  <footer class="pie"><span>Atajos: <b>1–4</b> cambiar de local · <b>F</b> pantalla completa</span><span>Demo preparada por Enrique Morales</span></footer>
+
+  <dialog id="dlg">
+    <h2>¿A qué dirección apunta el QR?</h2>
+    <p>El QR tiene que llevar a una web publicada para que el gerente lo abra con su móvil. Por defecto es el dominio de <code>config.js</code>. Si aún no está comprado, pon aquí la dirección de GitHub Pages (por ejemplo <code>https://usuario.github.io/neco-demo/</code>).</p>
+    <input id="dlg-url" type="url" placeholder="https://…/" spellcheck="false">
+    <div class="acciones"><button type="button" id="dlg-reset">Usar la de config.js</button><button type="button" class="prim" id="dlg-ok">Guardar</button></div>
+  </dialog>
+
+  <script src="config.js?v=8"></script>
+  <script src="js/comun.js?v=8"></script>
+  <script src="js/vendor/qrcode.js?v=8"></script>
+  <script>
+  (function () {
+    var C = window.CONFIG, N = window.NECO, ids = Object.keys(C.locales);
+    var $ = function (id) { return document.getElementById(id); };
+    var p = new URLSearchParams(location.search);
+    var CLAVE_URL = "neco-presentacion-url";
+
+    var estado = {
+      local: C.locales[p.get("local")] ? p.get("local") : ids[0],
+      mesa: p.get("mesa") || "12",
+      base: p.get("url") || leer() || C.baseUrl,
+    };
+    function leer() { try { return localStorage.getItem(CLAVE_URL); } catch (e) { return null; } }
+    function guardar(v) { try { v ? localStorage.setItem(CLAVE_URL, v) : localStorage.removeItem(CLAVE_URL); } catch (e) {} }
+    function normalizar(u) { u = (u || "").trim(); if (u && !/\/$/.test(u)) u += "/"; return u; }
+
+    var G = '<svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.1H42V20H24v8h11.3c-1.6 4.7-6.1 8-11.3 8-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 8 3l5.7-5.7C34 6.1 29.3 4 24 4 13 4 4 13 4 24s9 20 20 20 20-9 20-20c0-1.3-.1-2.6-.4-3.9z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 8 3l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2c-2 1.5-4.5 2.4-7.2 2.4-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.1H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.6-.4-3.9z"/></svg>';
+
+    function urlCliente(base, via) {
+      var u = base + "?local=" + estado.local;
+      if (estado.mesa) u += "&mesa=" + encodeURIComponent(estado.mesa);
+      return u + "&src=" + via;
+    }
+
+    function svgQR(texto) {
+      var qr = qrcode(0, "H");   // nivel H: admite el logo en el centro
+      qr.addData(texto); qr.make();
+      var n = qr.getModuleCount(), d = "";
+      for (var r = 0; r < n; r++) for (var c = 0; c < n; c++) if (qr.isDark(r, c)) d += "M" + c + " " + r + "h1v1h-1z";
+      return '<svg viewBox="-1 -1 ' + (n + 2) + ' ' + (n + 2) + '" shape-rendering="crispEdges" role="img" aria-label="Código QR"><path fill="#24302A" d="' + d + '"/></svg>';
+    }
+
+    /* ¿Está publicada la URL del QR? (fetch no-cors: solo distingue "responde" de "no responde") */
+    var comprobacion = 0;
+    function comprobar(base) {
+      var id = ++comprobacion, punto = $("punto"), aviso = $("aviso-url");
+      punto.className = "punto"; aviso.innerHTML = "";
+      if (!/^https?:\/\//.test(base)) return;
+      var ctl = window.AbortController ? new AbortController() : null;
+      var t = setTimeout(function () { if (ctl) ctl.abort(); }, 5000);
+      fetch(base, { mode: "no-cors", cache: "no-store", signal: ctl && ctl.signal })
+        .then(function () { if (id === comprobacion) punto.className = "punto ok"; })
+        .catch(function () {
+          if (id !== comprobacion) return;
+          punto.className = "punto ko";
+          aviso.innerHTML = '<p class="aviso-url">Web aún sin publicar: el QR no abrirá nada todavía. Cámbialo en <b>⚙ URL del QR</b>.</p>';
+        })
+        .then(function () { clearTimeout(t); });
+    }
+
+    function render() {
+      var l = C.locales[estado.local];
+      $("locales").innerHTML = ids.map(function (id, i) {
+        return '<button type="button" data-l="' + id + '" aria-pressed="' + (id === estado.local) + '">' + C.locales[id].corto + '<kbd>' + (i + 1) + '</kbd></button>';
+      }).join("");
+      $("mesa").value = estado.mesa;
+
+      var destino = urlCliente(estado.base, "qr");
+      $("qr").innerHTML = svgQR(destino);
+      $("url-texto").textContent = destino.replace(/^https?:\/\//, "").replace("xn--reseasnecobuffet-9tb.com", C.dominioVisible);
+      comprobar(estado.base);
+
+      $("titulo").textContent = "Escanea y deja tu reseña en " + l.corto;
+      $("paso3").textContent = "En la ficha de " + l.nombre + ", donde la gente busca dónde comer.";
+      $("nota-google").innerHTML = l.google
+        ? '<span class="g">' + G + '</span>Hoy en Google: <b>' + l.google.nota.toFixed(1).replace(".", ",") + '</b><span class="est">★★★★★</span>' + N.num(l.google.resenas, "es") + ' reseñas'
+        : "";
+
+      // El móvil simulado carga la página local (funciona sin publicar)
+      var f = $("f-movil"), src = "index.html?local=" + estado.local + (estado.mesa ? "&mesa=" + encodeURIComponent(estado.mesa) : "") + "&src=qr";
+      if (f.getAttribute("src") !== src) f.setAttribute("src", src);
+      ajustar();
+    }
+
+    /* Escala del móvil y del panel según el espacio disponible */
+    function ajustar() {
+      var cont = $("movil-cont"), h = cont.clientHeight;
+      var s = Math.max(.5, Math.min(1, (h - 22) / 844));
+      var mv = $("movil"); mv.style.setProperty("--s", s);
+      var pant = $("pantalla"); pant.style.width = 390 * s + "px"; pant.style.height = 844 * s + "px";
+      $("f-movil").style.transform = "scale(" + s + ")";
+
+      var marco = $("marco-panel"), fp = $("f-panel");
+      if (marco.clientWidth) {
+        var k = marco.clientWidth / 1280;
+        fp.style.transform = "scale(" + k + ")";
+        fp.style.height = marco.clientHeight / k + "px";
+      }
+    }
+
+    $("locales").addEventListener("click", function (e) {
+      var b = e.target.closest("[data-l]"); if (!b) return;
+      estado.local = b.getAttribute("data-l"); render();
+    });
+    $("mesa").addEventListener("input", function (e) { estado.mesa = e.target.value.replace(/[^0-9]/g, "").slice(0, 4); render(); });
+
+    $("completa").addEventListener("click", pantallaCompleta);
+    function pantallaCompleta() {
+      if (document.fullscreenElement) document.exitFullscreen();
+      else if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen();
+    }
+    document.addEventListener("keydown", function (e) {
+      if (e.target.tagName === "INPUT" || e.ctrlKey || e.metaKey || e.altKey) return;
+      var n = parseInt(e.key, 10);
+      if (n >= 1 && n <= ids.length) { estado.local = ids[n - 1]; render(); }
+      if (e.key === "f" || e.key === "F") pantallaCompleta();
+    });
+
+    var dlg = $("dlg");
+    $("ajustes").addEventListener("click", function () { $("dlg-url").value = estado.base; dlg.showModal(); });
+    $("dlg-ok").addEventListener("click", function () {
+      var v = normalizar($("dlg-url").value);
+      if (v) { estado.base = v; guardar(v === C.baseUrl ? "" : v); }
+      dlg.close(); render();
+    });
+    $("dlg-reset").addEventListener("click", function () { estado.base = C.baseUrl; guardar(""); dlg.close(); render(); });
+
+    var rt; addEventListener("resize", function () { clearTimeout(rt); rt = setTimeout(ajustar, 80); });
+    $("f-panel").addEventListener("load", ajustar);
+    render();
+  })();
+  </script>
+</body>
+</html>

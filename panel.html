@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="color-scheme" content="light">
+  <title>Neco Buffet · Dashboard de reseñas</title>
+  <link rel="icon" type="image/png" href="img/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;1,500&display=swap">
+  <link rel="stylesheet" href="css/estilos.css?v=8">
+  <link rel="stylesheet" href="css/panel.css?v=8">
+</head>
+<body class="panel">
+  <header class="barra panel-barra">
+    <div class="panel-marca">
+      <img src="img/logo-neco.png" alt="Neco Buffet" width="94" height="18">
+      <span class="panel-titulo">Dashboard de reseñas</span>
+    </div>
+    <div class="leyenda-datos">
+      <span class="tag tag-real">Dato real · Google Maps</span>
+      <span class="tag tag-ej">Ejemplo · simulado</span>
+    </div>
+  </header>
+
+  <div class="barra-filtros">
+    <div class="filtros-cont">
+      <div class="filtro-grupo">
+        <span class="filtro-et">Estrellas</span>
+        <div class="filtros filtros-est" id="f-estrellas" role="group" aria-label="Filtrar por estrellas"></div>
+      </div>
+      <div class="filtro-grupo">
+        <span class="filtro-et">Local</span>
+        <div class="filtros" id="filtros" role="group" aria-label="Filtrar por local"></div>
+      </div>
+    </div>
+  </div>
+
+  <main class="panel-cont">
+    <!-- =================== REPUTACIÓN EN GOOGLE (REAL) =================== -->
+    <div class="seccion-cab">
+      <h1>Reputación en Google</h1>
+      <span class="tag tag-real" id="fecha-real"></span>
+    </div>
+
+    <section class="fila-hero">
+      <div class="hero-nota" id="hero-nota"></div>
+      <div class="kpis kpis-4" id="kpis-real"></div>
+    </section>
+
+    <div class="rejilla-2">
+      <section class="tarjeta-panel">
+        <div class="cab"><div><h2>Reparto de estrellas</h2><p class="sub">Pulsa una fila para filtrar todo el panel</p></div><span class="tag tag-real">Real</span></div>
+        <div id="g-histo"></div>
+      </section>
+      <section class="tarjeta-panel">
+        <div class="cab"><div><h2>Comparativa por local</h2><p class="sub" id="comp-sub"></p></div><span class="tag tag-real">Real</span></div>
+        <div id="g-comp"></div>
+        <div class="leyenda leyenda-est" id="ley-est"></div>
+      </section>
+    </div>
+
+    <section class="tarjeta-panel">
+      <div class="cab"><div><h2>Objetivos de nota</h2><p class="sub">Google muestra la nota con un decimal. Cuánto falta para subir y cuánto margen hay antes de bajar.</p></div><span class="tag tag-real">Real</span></div>
+      <div class="tabla-scroll sin-alto" id="t-objetivos"></div>
+    </section>
+
+    <section class="tarjeta-panel">
+      <div class="cab"><div><h2>De qué hablan los clientes</h2><p class="sub" id="temas-sub">Temas que Google detecta en las reseñas y en cuántas aparecen</p></div><span class="tag tag-real">Real</span></div>
+      <div class="temas" id="temas"></div>
+    </section>
+
+    <!-- =================== ACTIVIDAD DE LAS PLACAS (EJEMPLO) =================== -->
+    <div class="seccion-cab seccion-2">
+      <h1>Actividad de las placas NFC/QR</h1>
+      <span class="tag tag-ej" id="periodo"></span>
+    </div>
+
+    <section class="kpis kpis-6" id="kpis-placas"></section>
+
+    <div class="rejilla-2">
+      <section class="tarjeta-panel">
+        <div class="cab">
+          <div><h2>Escaneos y clics a Google por día</h2><p class="sub">Las zonas sombreadas son fines de semana y festivos</p></div>
+          <div class="leyenda"><span><i class="sw sw-barra"></i>Escaneos</span><span><i class="sw sw-linea"></i>Clics a Google</span></div>
+        </div>
+        <div class="grafica" id="g-dias"></div>
+        <details class="ver-tabla"><summary>Ver datos en tabla</summary><div id="t-dias"></div></details>
+      </section>
+      <section class="tarjeta-panel">
+        <div class="cab"><div><h2 id="t-resenas-dia">Reseñas nuevas por día</h2><p class="sub">Publicadas en Google tras pulsar el botón de la página</p></div><div class="leyenda leyenda-est" id="ley-est-2"></div></div>
+        <div class="grafica" id="g-resenas"></div>
+      </section>
+    </div>
+
+    <div class="rejilla-2">
+      <section class="tarjeta-panel">
+        <div class="cab"><div><h2>Escaneos por local</h2><p class="sub">Y porcentaje que pulsa el botón de Google</p></div></div>
+        <div id="g-locales"></div>
+      </section>
+      <section class="tarjeta-panel">
+        <div class="cab">
+          <div><h2>Escaneos por mesa</h2><p class="sub" id="mesas-sub"></p></div>
+          <label class="mini-select" id="mesas-sel-cont"><span class="sr">Local</span><select id="mesas-sel"></select></label>
+        </div>
+        <div id="g-mesas"></div>
+      </section>
+    </div>
+
+    <div class="rejilla-2">
+      <section class="tarjeta-panel">
+        <div class="cab"><div><h2 id="t-lista-resenas">Reseñas nuevas</h2><p class="sub">Responder rápido, sobre todo a las negativas, mejora la imagen del local</p></div></div>
+        <div id="l-resenas" class="lista-quejas"></div>
+      </section>
+      <section class="tarjeta-panel">
+        <div class="cab"><div><h2>Mensajes privados</h2><p class="sub">Lo que los clientes cuentan solo al equipo, sin sustituir a Google</p></div></div>
+        <div id="l-quejas" class="lista-quejas"></div>
+      </section>
+    </div>
+
+    <section class="fase2">
+      <h2>¿De dónde salen los datos?</h2>
+      <p><b>Reputación en Google (real):</b> nota, número de reseñas, reparto por estrellas y temas, tomados de Google Maps el día indicado. En la fase 2 se actualizan solos cada día con la API del Perfil de Empresa de Google, que también permite leer y responder cada reseña desde aquí.<br>
+      <b>Actividad de las placas (ejemplo):</b> cifras simuladas para la demostración. En la fase 2 las registra un contador gratuito (Cloudflare Worker o Google Sheets) sin guardar datos personales.</p>
+    </section>
+  </main>
+
+  <footer class="pie"><p>Demo preparada por Enrique Morales</p></footer>
+  <div class="tip" id="tip" role="tooltip" hidden></div>
+
+  <script src="config.js?v=8"></script>
+  <script src="js/comun.js?v=8"></script>
+  <script src="js/datos-demo.js?v=8"></script>
+  <script src="js/panel.js?v=8"></script>
+</body>
+</html>
