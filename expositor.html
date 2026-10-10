@@ -127,9 +127,9 @@
 
   <div class="hojas" id="hojas"></div>
 
-  <script src="config.js?v=8"></script>
-  <script src="js/comun.js?v=8"></script>
-  <script src="js/vendor/qrcode.js?v=8"></script>
+  <script src="config.js?v=10"></script>
+  <script src="js/comun.js?v=10"></script>
+  <script src="js/vendor/qrcode.js?v=10"></script>
   <script>
   (function () {
     var C = window.CONFIG, N = window.NECO;
@@ -166,7 +166,7 @@
         '<p class="instruccion">' + NFC + 'Acerca tu móvil o escanea el QR</p>' +
         '<div class="zona-qr"><div class="qr">' + svgQR(N.urlLocal(id, mesa, "qr")) + '</div>' +
         '<div class="nfc">' + NFC.replace("<svg", '<svg aria-hidden="true"') + '<span>NFC</span></div></div>' +
-        '<div class="opciones"><span>⭐ Reseña en Google</span><span>Platos de hoy</span><span>Grupos</span></div>' +
+        '<div class="opciones"><span>⭐ Reseña en Google</span><span>Alérgenos</span><span>Platos de hoy</span></div>' +
         '<p class="en">Tap your phone or scan the QR code</p>' +
         '<div class="pie-a6"><div class="mesa-n">' + (mesa ? '<small>Mesa · Table</small>' + mesa : '<small>Welcome</small>Bienvenidos') + '</div>' +
         '<div class="local-n"><b>' + l.nombre + '</b>' + C.dominioVisible + '</div></div>' +

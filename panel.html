@@ -10,8 +10,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;1,500&display=swap">
-  <link rel="stylesheet" href="css/estilos.css?v=8">
-  <link rel="stylesheet" href="css/panel.css?v=8">
+  <link rel="stylesheet" href="css/estilos.css?v=10">
+  <link rel="stylesheet" href="css/panel.css?v=10">
 </head>
 <body class="panel">
   <header class="barra panel-barra">
@@ -21,7 +21,8 @@
     </div>
     <div class="leyenda-datos">
       <span class="tag tag-real">Dato real · Google Maps</span>
-      <span class="tag tag-ej">Ejemplo · simulado</span>
+      <span class="tag tag-ej" id="tag-placas-ley">Ejemplo · simulado</span>
+      <a class="boton-informe" id="btn-informe" href="informe.html" target="_blank" rel="noopener">Informe mensual ↗</a>
     </div>
   </header>
 
@@ -50,6 +51,11 @@
       <div class="kpis kpis-4" id="kpis-real"></div>
     </section>
 
+    <section class="tarjeta-panel prioridades">
+      <div class="cab"><div><h2>Prioridades de esta semana</h2><p class="sub">Recomendaciones calculadas automáticamente con los datos de arriba</p></div></div>
+      <ol class="recs" id="recs"></ol>
+    </section>
+
     <div class="rejilla-2">
       <section class="tarjeta-panel">
         <div class="cab"><div><h2>Reparto de estrellas</h2><p class="sub">Pulsa una fila para filtrar todo el panel</p></div><span class="tag tag-real">Real</span></div>
@@ -67,18 +73,39 @@
       <div class="tabla-scroll sin-alto" id="t-objetivos"></div>
     </section>
 
-    <section class="tarjeta-panel">
-      <div class="cab"><div><h2>De qué hablan los clientes</h2><p class="sub" id="temas-sub">Temas que Google detecta en las reseñas y en cuántas aparecen</p></div><span class="tag tag-real">Real</span></div>
-      <div class="temas" id="temas"></div>
-    </section>
+    <div class="rejilla-2">
+      <section class="tarjeta-panel">
+        <div class="cab">
+          <div><h2>Competencia cercana</h2><p class="sub" id="rival-sub"></p></div>
+          <div class="cab-der"><label class="mini-select" id="rival-sel-cont"><span class="sr">Local</span><select id="rival-sel"></select></label><span class="tag tag-real">Real</span></div>
+        </div>
+        <div id="g-rivales"></div>
+      </section>
+      <section class="tarjeta-panel">
+        <div class="cab"><div><h2>De qué hablan los clientes</h2><p class="sub" id="temas-sub">Temas que Google detecta en las reseñas y en cuántas aparecen</p></div><span class="tag tag-real">Real</span></div>
+        <div class="temas" id="temas"></div>
+      </section>
+    </div>
 
-    <!-- =================== ACTIVIDAD DE LAS PLACAS (EJEMPLO) =================== -->
+    <!-- =================== ACTIVIDAD DE LAS PLACAS =================== -->
     <div class="seccion-cab seccion-2">
       <h1>Actividad de las placas NFC/QR</h1>
       <span class="tag tag-ej" id="periodo"></span>
     </div>
+    <div id="estado-contador"></div>
 
     <section class="kpis kpis-6" id="kpis-placas"></section>
+
+    <div class="rejilla-2">
+      <section class="tarjeta-panel">
+        <div class="cab"><div><h2>Embudo: del escaneo a la reseña</h2><p class="sub">Cuántos clientes llegan a cada paso y dónde se pierden</p></div></div>
+        <div id="g-embudo"></div>
+      </section>
+      <section class="tarjeta-panel">
+        <div class="cab"><div><h2>Horas punta</h2><p class="sub" id="horas-sub">Escaneos por día de la semana y hora</p></div></div>
+        <div id="g-horas"></div>
+      </section>
+    </div>
 
     <div class="rejilla-2">
       <section class="tarjeta-panel">
@@ -116,23 +143,25 @@
       </section>
       <section class="tarjeta-panel">
         <div class="cab"><div><h2>Mensajes privados</h2><p class="sub">Lo que los clientes cuentan solo al equipo, sin sustituir a Google</p></div></div>
+        <div id="g-temas-queja"></div>
         <div id="l-quejas" class="lista-quejas"></div>
       </section>
     </div>
 
     <section class="fase2">
       <h2>¿De dónde salen los datos?</h2>
-      <p><b>Reputación en Google (real):</b> nota, número de reseñas, reparto por estrellas y temas, tomados de Google Maps el día indicado. En la fase 2 se actualizan solos cada día con la API del Perfil de Empresa de Google, que también permite leer y responder cada reseña desde aquí.<br>
-      <b>Actividad de las placas (ejemplo):</b> cifras simuladas para la demostración. En la fase 2 las registra un contador gratuito (Cloudflare Worker o Google Sheets) sin guardar datos personales.</p>
+      <p><b>Reputación en Google (real):</b> nota, número de reseñas, reparto por estrellas, temas y competencia, tomados de Google Maps el día indicado. En la fase 2 se actualizan solos cada día con la API del Perfil de Empresa de Google, que también permite leer y responder cada reseña desde aquí.<br>
+      <b>Actividad de las placas:</b> si el contador está conectado (Google Sheets), son los escaneos, clics y mensajes reales; si no, cifras de ejemplo para la demostración. No se guardan datos personales salvo lo que el cliente escribe en un formulario.</p>
     </section>
   </main>
 
   <footer class="pie"><p>Demo preparada por Enrique Morales</p></footer>
   <div class="tip" id="tip" role="tooltip" hidden></div>
 
-  <script src="config.js?v=8"></script>
-  <script src="js/comun.js?v=8"></script>
-  <script src="js/datos-demo.js?v=8"></script>
-  <script src="js/panel.js?v=8"></script>
+  <script src="config.js?v=10"></script>
+  <script src="js/comun.js?v=10"></script>
+  <script src="js/datos-demo.js?v=10"></script>
+  <script src="js/metricas.js?v=10"></script>
+  <script src="js/panel.js?v=10"></script>
 </body>
 </html>

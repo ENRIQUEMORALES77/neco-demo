@@ -23,6 +23,10 @@ window.I18N = {
     quejaTexto: "¿Qué ha pasado?",
     quejaPlaceholder: "Cuéntanos lo que quieras: comida, servicio, limpieza, espera…",
     quejaContacto: "Email o teléfono (opcional)",
+    quejaTema: "¿De qué se trata? (opcional)",
+    cats: { comida: "Comida", reposicion: "Reposición", limpieza: "Limpieza", espera: "Espera", atencion: "Atención", alergenos: "Alérgenos", otro: "Otro" },
+    privacidad: "Tu mensaje solo lo ve el equipo de Neco para atenderte.",
+    fichaTema: "Tema",
     quejaEnviar: "Enviar mensaje privado",
     quejaIntroWa: "Lo leerá el responsable del local y te contestará por WhatsApp.",
     quejaEnviarWa: "Enviar por WhatsApp",
@@ -42,8 +46,8 @@ window.I18N = {
 
     alergenos: "Alérgenos e intolerancias",
     alergenosSub: "Información para tu seguridad",
-    alergenosTexto: "Consulta con nuestro equipo antes de servirte: te indicaremos qué platos son aptos para ti.",
-    alergenosFase2: "Próximamente: carta de alérgenos digital por plato.",
+    alergenosTexto: "Filtra los platos según tus alergias o intolerancias. Ante cualquier duda, consulta con nuestro equipo antes de servirte.",
+    alergenosVer: "Ver carta de alérgenos",
 
     grupos: "¿Celebras algo o venís en grupo?",
     gruposSub: "Calcula un presupuesto orientativo",
@@ -146,6 +150,10 @@ window.I18N = {
     quejaTexto: "What happened?",
     quejaPlaceholder: "Tell us anything: food, service, cleanliness, waiting time…",
     quejaContacto: "Email or phone (optional)",
+    quejaTema: "What is it about? (optional)",
+    cats: { comida: "Food", reposicion: "Restocking", limpieza: "Cleanliness", espera: "Waiting time", atencion: "Service", alergenos: "Allergens", otro: "Other" },
+    privacidad: "Only the Neco team sees your message.",
+    fichaTema: "Topic",
     quejaEnviar: "Send private message",
     quejaIntroWa: "The restaurant manager will read it and reply on WhatsApp.",
     quejaEnviarWa: "Send via WhatsApp",
@@ -165,8 +173,8 @@ window.I18N = {
 
     alergenos: "Allergens & intolerances",
     alergenosSub: "Information for your safety",
-    alergenosTexto: "Please ask our team before serving yourself: we'll tell you which dishes are suitable for you.",
-    alergenosFase2: "Coming soon: digital allergen menu for every dish.",
+    alergenosTexto: "Filter the dishes by your allergies or intolerances. If in doubt, please ask our team before serving yourself.",
+    alergenosVer: "See allergen menu",
 
     grupos: "Celebrating or coming as a group?",
     gruposSub: "Get an estimated quote",

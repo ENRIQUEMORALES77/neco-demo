@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="color-scheme" content="light">
+  <title>Neco Buffet · Informe mensual de reseñas</title>
+  <link rel="icon" type="image/png" href="img/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;1,500&display=swap">
+  <style>
+    @page { size: A4; margin: 12mm 12mm 14mm; }
+    :root {
+      --verde: #6E8273; --verde-osc: #4F6154; --verde-claro: #E7EDE8; --crema: #FAF7F2; --crema-2: #F3EDE3;
+      --tinta: #1E1E1C; --tinta-2: #55534E; --tinta-3: #85827B; --borde: #E6DFD3; --terracota: #C8623E;
+      --serif: "Lora", Georgia, serif; --sans: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    }
+    * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    body { margin: 0; background: #E9E4DA; color: var(--tinta); font: 10pt/1.42 var(--sans); }
+    .acciones { position: sticky; top: 0; z-index: 2; display: flex; gap: 10px; justify-content: center; padding: 10px; background: #fff; border-bottom: 1px solid var(--borde); }
+    .acciones button, .acciones a { min-height: 36px; padding: 8px 16px; border-radius: 10px; border: 0; background: var(--verde-osc); color: #fff; font: 700 14px var(--sans); cursor: pointer; text-decoration: none; }
+    .acciones a { background: var(--crema-2); color: var(--tinta); }
+    .hoja { width: 210mm; min-height: 297mm; margin: 18px auto; padding: 12mm; background: #fff; box-shadow: 0 6px 24px rgba(0,0,0,.14); }
+    .cab { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; padding-bottom: 5mm; border-bottom: 2px solid var(--verde-osc); }
+    .cab img { height: 9mm; }
+    .cab h1 { font: 600 17pt/1.15 var(--serif); margin: 2mm 0 0; }
+    .cab .meta { text-align: right; font-size: 8.5pt; color: var(--tinta-2); line-height: 1.5; }
+    h2 { font: 600 12pt/1.2 var(--serif); margin: 6mm 0 2.5mm; display: flex; align-items: center; gap: 8px; }
+    .tag { font: 700 7pt var(--sans); letter-spacing: .03em; padding: 1mm 2.2mm; border-radius: 99px; }
+    .tag-real { background: #E3EEE6; color: #2F5A3E; }
+    .tag-ej { background: #FFF1D6; color: #8A5300; }
+    .cifras { display: grid; grid-template-columns: repeat(5, 1fr); gap: 3mm; }
+    .cifra { border: 1px solid var(--borde); border-radius: 3mm; padding: 2.6mm 3mm; }
+    .cifra .et { font-size: 7.5pt; color: var(--tinta-2); font-weight: 600; }
+    .cifra .v { font-size: 16pt; font-weight: 750; line-height: 1.2; margin-top: .6mm; }
+    .cifra .s { font-size: 7.5pt; color: var(--tinta-3); }
+    .cifra.dest { background: var(--verde-osc); border-color: var(--verde-osc); color: #fff; }
+    .cifra.dest .et, .cifra.dest .s { color: rgba(255,255,255,.85); }
+    table { width: 100%; border-collapse: collapse; font-size: 8.5pt; font-variant-numeric: tabular-nums; }
+    th { text-align: left; font-weight: 600; color: var(--tinta-3); font-size: 7.5pt; padding: 1.4mm 1.6mm; border-bottom: 1px solid var(--borde); }
+    td { padding: 1.6mm; border-bottom: 1px solid #F0EBE2; }
+    td.n, th.n { text-align: right; }
+    .mal { color: #A3402F; font-weight: 700; }
+    .recs { margin: 0; padding: 0; list-style: none; display: grid; gap: 1.8mm; }
+    .recs li { padding: 2mm 3mm; border-radius: 2mm; background: var(--crema); border-left: 1.2mm solid var(--borde); font-size: 8.8pt; }
+    .recs li b { font-size: 7pt; letter-spacing: .08em; text-transform: uppercase; color: var(--tinta-3); display: block; }
+    .r-riesgo { border-left-color: #B9473A !important; background: #FBF0EC !important; }
+    .r-oportunidad { border-left-color: #2E7D4F !important; background: #EEF5F0 !important; }
+    .r-competencia { border-left-color: #C8892A !important; background: #FFF6E6 !important; }
+    .dos { display: grid; grid-template-columns: 1fr 1fr; gap: 6mm; }
+    .barras { display: grid; grid-template-columns: 30mm 1fr 22mm; gap: 1.6mm 3mm; align-items: center; font-size: 8.5pt; }
+    .pista { height: 3.2mm; background: #F1ECE3; border-radius: 0 1mm 1mm 0; overflow: hidden; }
+    .pista i { display: block; height: 100%; background: var(--verde); border-radius: 0 1mm 1mm 0; }
+    .pista.t i { background: var(--terracota); }
+    .barras .n { text-align: right; color: var(--tinta-2); }
+    .nota { font-size: 7.5pt; color: var(--tinta-3); margin: 2mm 0 0; }
+    .pie { margin-top: 7mm; padding-top: 3mm; border-top: 1px solid var(--borde); display: flex; justify-content: space-between; font-size: 7.5pt; color: var(--tinta-3); }
+    @media print {
+      body { background: none; }
+      .acciones { display: none; }
+      .hoja { width: auto; min-height: 0; margin: 0; padding: 0; box-shadow: none; }
+      h2 { break-after: avoid; }
+      .bloque { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <div class="acciones">
+    <button type="button" onclick="window.print()">Imprimir / Guardar PDF</button>
+    <a href="panel.html">Volver al panel</a>
+  </div>
+  <article class="hoja" id="hoja"></article>
+
+  <script src="config.js?v=10"></script>
+  <script src="js/comun.js?v=10"></script>
+  <script src="js/datos-demo.js?v=10"></script>
+  <script src="js/metricas.js?v=10"></script>
+  <script>
+  (function () {
+    var C = window.CONFIG, N = window.NECO, M = window.METRICAS;
+    var p = new URLSearchParams(location.search);
+    var lista = C.locales[p.get("local")] ? [p.get("local")] : M.ids;
+    var num = function (n) { return N.num(n, "es"); };
+    var dec = function (n, d) { return n.toFixed(d).replace(".", ","); };
+    var pct = function (a, b) { return b ? Math.round(a / b * 100) + " %" : "–"; };
+    var fLarga = function (iso) { return N.fechaDeIso(iso).toLocaleDateString("es-ES", { day: "numeric", month: "long", year: "numeric" }); };
+    function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+
+    M.cargarDatos().then(function (r) {
+      var D = r.datos, real = r.modo === "real";
+      var a = M.agregado(lista), u = M.umbrales(a);
+      var ambito = lista.length > 1 ? "Los 4 restaurantes" : C.locales[lista[0]].nombre;
+      var tagPlacas = real ? '<span class="tag tag-real">Real · contador</span>' : '<span class="tag tag-ej">Ejemplo · simulado</span>';
+      var sat = a.e[4] + a.e[5], cri = a.e[1] + a.e[2], neto = (a.e[5] - cri) / a.n * 100;
+
+      var filas = lista.map(function (id) {
+        var x = M.agregado([id]), ux = M.umbrales(x), rk = M.ranking(id);
+        return '<tr><td><b>' + esc(C.locales[id].corto) + '</b></td><td class="n"><b>' + dec(ux.vis, 1) + '</b></td><td class="n">' + dec(x.media, 3) + '</td>' +
+          '<td class="n">' + num(x.n) + '</td><td class="n">' + dec(x.e[1] / x.n * 100, 1) + ' %</td>' +
+          '<td class="n">' + num(ux.n5) + ' de 5★ → ' + dec(ux.vis + .1, 1) + '</td>' +
+          '<td class="n' + (ux.n1 <= 20 ? " mal" : "") + '">' + num(ux.n1) + ' de 1★ → ' + dec(ux.vis - .1, 1) + '</td>' +
+          '<td class="n">' + rk.puesto + 'º de ' + rk.total + ' (media ' + dec(rk.media, 2) + ')</td></tr>';
+      }).join("");
+
+      var serie = M.serieDiaria(D, lista);
+      var t = serie.reduce(function (s, d) { s.e += d.escaneos; s.n += d.nfc; s.c += d.clics; return s; }, { e: 0, n: 0, c: 0 });
+      var nuevas = M.nuevas(D, lista), resp = nuevas.filter(function (x) { return x.respondida; });
+      var mediaN = nuevas.length ? nuevas.reduce(function (s, x) { return s + x.estrellas; }, 0) / nuevas.length : 0;
+      var horasR = resp.length ? resp.reduce(function (s, x) { return s + x.horasRespuesta; }, 0) / resp.length : 0;
+      var emb = M.embudo(D, lista), base = emb[0].n || 1;
+      var temas = M.temasQueja(D, lista), maxT = temas.length ? temas[0].n : 1;
+      var hm = M.horas(D, lista), pico = [0, 0, -1];
+      for (var d = 0; d < 7; d++) for (var h = 0; h < 24; h++) if (hm[d][h] > pico[2]) pico = [d, h, hm[d][h]];
+      var dias = ["domingos", "lunes", "martes", "miércoles", "jueves", "viernes", "sábados"];
+      var recs = M.recomendaciones(D, lista);
+      var TIPO = { riesgo: "Riesgo", oportunidad: "Oportunidad", competencia: "Competencia", accion: "Acción", info: "Dato" };
+
+      document.getElementById("hoja").innerHTML =
+        '<header class="cab"><div><img src="' + C.marca.logo + '" alt="Neco Buffet"><h1>Informe mensual de reseñas</h1></div>' +
+        '<div class="meta"><b>' + esc(ambito) + '</b><br>Actividad: ' + fLarga(D.dias[0]) + ' – ' + fLarga(D.dias[D.dias.length - 1]) +
+        '<br>Google Maps a ' + fLarga(C.locales[M.ids[0]].google.fecha) + '</div></header>' +
+
+        '<section class="bloque"><h2>Reputación en Google <span class="tag tag-real">Dato real</span></h2><div class="cifras">' +
+          '<div class="cifra dest"><div class="et">Nota visible</div><div class="v">' + dec(u.vis, 1) + ' ★</div><div class="s">Exacta ' + dec(a.media, 3) + '</div></div>' +
+          '<div class="cifra"><div class="et">Reseñas totales</div><div class="v">' + num(a.n) + '</div><div class="s">en Google Maps</div></div>' +
+          '<div class="cifra"><div class="et">Satisfechos (4–5★)</div><div class="v">' + pct(sat, a.n) + '</div><div class="s">' + num(sat) + ' reseñas</div></div>' +
+          '<div class="cifra"><div class="et">Críticas (1–2★)</div><div class="v">' + pct(cri, a.n) + '</div><div class="s">' + num(cri) + ' reseñas</div></div>' +
+          '<div class="cifra"><div class="et">Índice neto</div><div class="v">' + (neto > 0 ? "+" : "") + Math.round(neto) + '</div><div class="s">% 5★ − % 1–2★</div></div>' +
+        '</div>' +
+        '<table style="margin-top:3mm"><thead><tr><th>Local</th><th class="n">Nota</th><th class="n">Exacta</th><th class="n">Reseñas</th><th class="n">% 1★</th><th class="n">Para subir</th><th class="n">Margen antes de bajar</th><th class="n">Puesto en su zona</th></tr></thead><tbody>' + filas + '</tbody></table></section>' +
+
+        '<section class="bloque"><h2>Prioridades para el próximo mes</h2><ol class="recs">' +
+          recs.map(function (x) { return '<li class="r-' + x.tipo + '"><b>' + TIPO[x.tipo] + '</b>' + esc(x.texto) + '</li>'; }).join("") + '</ol></section>' +
+
+        '<section class="bloque"><h2>Actividad de las placas NFC/QR ' + tagPlacas + '</h2><div class="cifras">' +
+          '<div class="cifra"><div class="et">Escaneos</div><div class="v">' + num(t.e) + '</div><div class="s">' + pct(t.n, t.e) + ' NFC · ' + pct(t.e - t.n, t.e) + ' QR</div></div>' +
+          '<div class="cifra"><div class="et">Clics a Google</div><div class="v">' + num(t.c) + '</div><div class="s">' + pct(t.c, t.e) + ' de los escaneos</div></div>' +
+          (real
+            ? '<div class="cifra"><div class="et">Reseñas nuevas</div><div class="v">—</div><div class="s">API Google (fase 2)</div></div><div class="cifra"><div class="et">Mensajes privados</div><div class="v">' + num(D.quejas.filter(function (q) { return lista.indexOf(q.local) !== -1; }).length) + '</div><div class="s">recibidos</div></div><div class="cifra"><div class="et">Escaneos al día</div><div class="v">' + dec(t.e / D.dias.length, 1) + '</div><div class="s">de media</div></div>'
+            : '<div class="cifra"><div class="et">Reseñas nuevas</div><div class="v">' + num(nuevas.length) + '</div><div class="s">nota media ' + dec(mediaN, 2) + ' ★</div></div>' +
+              '<div class="cifra"><div class="et">Respondidas</div><div class="v">' + pct(resp.length, nuevas.length) + '</div><div class="s">' + (nuevas.length - resp.length) + ' pendientes</div></div>' +
+              '<div class="cifra"><div class="et">Tiempo de respuesta</div><div class="v">' + Math.round(horasR) + ' h</div><div class="s">objetivo &lt; 24 h</div></div>') +
+        '</div>' +
+        '<div class="dos" style="margin-top:4mm"><div><h2 style="margin-top:0">Embudo</h2><div class="barras">' +
+          emb.map(function (s, i) {
+            return '<span>' + s.paso + '</span><span class="pista' + (i > 1 ? " t" : "") + '"><i style="width:' + (s.n == null ? 0 : Math.max(1.5, s.n / base * 100)) + '%"></i></span><span class="n">' + (s.n == null ? "fase 2" : num(s.n)) + '</span>';
+          }).join("") + '</div>' +
+          (pico[2] > 0 ? '<p class="nota">Hora punta de escaneos: <b>' + dias[pico[0]] + ' a las ' + pico[1] + ':00</b>.</p>' : '') + '</div>' +
+        '<div><h2 style="margin-top:0">De qué se quejan en privado</h2><div class="barras">' +
+          (temas.length ? temas.slice(0, 6).map(function (x) { return '<span>' + x.nombre + '</span><span class="pista t"><i style="width:' + (x.n / maxT * 100) + '%"></i></span><span class="n">' + x.n + '</span>'; }).join("") : '<span>Sin mensajes</span><span></span><span></span>') +
+        '</div></div></div></section>' +
+
+        '<footer class="pie"><span>Neco Buffet · ' + esc(ambito) + '</span><span>' + C.marca.pie + '</span></footer>';
+      document.title = "Informe de reseñas · " + ambito;
+    });
+  })();
+  </script>
+</body>
+</html>

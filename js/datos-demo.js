@@ -44,27 +44,27 @@
   for (var i = 30; i >= 1; i--) dias.push(N.sumarDias(hoy, -i));
 
   var ids = Object.keys(C.locales);
-  var porDia = {}, mesas = {}, quejas = [], resenas = [];
+  var porDia = {}, mesas = {}, horas = {}, quejas = [], resenas = [];
 
   var textosQueja = [
-    ["El arroz de la segunda bandeja estaba frío.", "Comida"],
-    ["Tardaron bastante en reponer el pescado a la plancha.", "Reposición"],
-    ["La mesa estaba pegajosa cuando nos sentamos.", "Limpieza"],
-    ["Mucha cola en la entrada a las 14:15, más de 20 minutos esperando.", "Espera"],
-    ["En el baño no había papel.", "Limpieza"],
-    ["No encontré información de alérgenos en los postres.", "Alérgenos"],
-    ["Hacía mucho calor en la zona del fondo.", "Local"],
-    ["Un camarero fue algo brusco al retirar los platos.", "Servicio"],
-    ["No quedaba paella cuando llegamos a las 15:45.", "Reposición"],
-    ["La música estaba demasiado alta para comer tranquilos.", "Local"],
-    ["Las patatas estaban muy saladas hoy.", "Comida"],
-    ["Nos cobraron la bebida dos veces. Lo arreglaron en caja, pero os aviso.", "Cobro"],
-    ["La máquina de helado no funcionaba.", "Comida"],
-    ["Echo de menos más opciones veganas.", "Sugerencia"],
-    ["Pedimos una trona para el bebé y tardaron mucho en traerla.", "Servicio"],
-    ["Los vasos tenían marcas de cal.", "Limpieza"],
-    ["Todo bien, pero la fruta estaba algo verde.", "Comida"],
-    ["Faltaban cubiertos limpios en la zona de postres.", "Reposición"],
+    ["El arroz de la segunda bandeja estaba frío.", "comida"],
+    ["Tardaron bastante en reponer el pescado a la plancha.", "reposicion"],
+    ["La mesa estaba pegajosa cuando nos sentamos.", "limpieza"],
+    ["Mucha cola en la entrada a las 14:15, más de 20 minutos esperando.", "espera"],
+    ["En el baño no había papel.", "limpieza"],
+    ["No encontré información de alérgenos en los postres.", "alergenos"],
+    ["Hacía mucho calor en la zona del fondo.", "otro"],
+    ["Un camarero fue algo brusco al retirar los platos.", "atencion"],
+    ["No quedaba paella cuando llegamos a las 15:45.", "reposicion"],
+    ["La música estaba demasiado alta para comer tranquilos.", "otro"],
+    ["Las patatas estaban muy saladas hoy.", "comida"],
+    ["Nos cobraron la bebida dos veces. Lo arreglaron en caja, pero os aviso.", "atencion"],
+    ["La máquina de helado no funcionaba.", "comida"],
+    ["Echo de menos más opciones veganas.", "otro"],
+    ["Pedimos una trona para el bebé y tardaron mucho en traerla.", "atencion"],
+    ["Los vasos tenían marcas de cal.", "limpieza"],
+    ["Todo bien, pero la fruta estaba algo verde.", "comida"],
+    ["Faltaban cubiertos limpios en la zona de postres.", "reposicion"],
   ];
 
   /* Textos de ejemplo (inventados) para las reseñas nuevas, por estrellas */
@@ -84,6 +84,26 @@
   var nombres = ["Laura", "Javier", "Marta", "Carlos", "Lucía", "Pablo", "Ana", "Sergio", "Elena", "Raúl", "Nuria", "Vicent", "Amparo", "Jordi", "Paula", "Andrés", "Rocío", "Toni", "Sarah", "Tom"];
   var iniciales = "GMSLRPCVTBFN";
 
+  /* Reparto de los escaneos de un día por horas, según los servicios que abren */
+  var PERFIL_HORAS = {
+    desayuno: { 8: .35, 9: .40, 10: .25 },
+    comida: { 13: .22, 14: .38, 15: .28, 16: .12 },
+    cena: { 20: .14, 21: .42, 22: .34, 23: .10 },
+  };
+  function repartirHoras(l, iso, total, matriz) {
+    var dow = N.fechaDeIso(iso).getDay(), pesos = {};
+    var cena = N.abreServicio(l, iso, "cena"), madruga = N.franjasFecha(l, iso).some(function (f) { return N.aMin(f.de) < 600; });
+    function suma(perfil, share) { Object.keys(perfil).forEach(function (h) { pesos[h] = (pesos[h] || 0) + perfil[h] * share; }); }
+    if (madruga) { suma(PERFIL_HORAS.desayuno, .14); suma(PERFIL_HORAS.comida, .86); }
+    else if (cena) { suma(PERFIL_HORAS.comida, dow === 0 || dow === 6 ? .58 : .55); suma(PERFIL_HORAS.cena, dow === 0 || dow === 6 ? .42 : .45); }
+    else suma(PERFIL_HORAS.comida, 1);
+    var resto = total;
+    Object.keys(pesos).forEach(function (h, i, arr) {
+      var n = i === arr.length - 1 ? resto : Math.min(resto, Math.round(total * pesos[h] * ruido(.15)));
+      matriz[dow][+h] += n; resto -= n;
+    });
+  }
+
   function horaServicio(l, iso) {
     return ponderado(N.abreServicio(l, iso, "cena") ? [["13", 3], ["14", 5], ["15", 4], ["21", 3], ["22", 2]] : [["13", 3], ["14", 5], ["15", 4]]) +
       ":" + String(entre(0, 59)).padStart(2, "0");
@@ -92,6 +112,7 @@
   ids.forEach(function (id) {
     var l = C.locales[id], pf = perfil[id] || { base: 50, dia: [1, 1, 1, 1, 1, 1, 1], google: .38, publica: .32, quejas: .005 };
     porDia[id] = [];
+    horas[id] = [0, 1, 2, 3, 4, 5, 6].map(function () { return new Array(24).fill(0); });
     var totalMesa = 0, totalEntrada = 0;
 
     dias.forEach(function (iso) {
@@ -121,6 +142,7 @@
       }
       porDia[id].push({ iso: iso, escaneos: esc, nfc: nfc, qr: esc - nfc, entrada: entrada, clics: clics, resenas: nr, porEstrella: dia });
       totalMesa += esc - entrada; totalEntrada += entrada;
+      if (esc) repartirHoras(l, iso, esc, horas[id]);
 
       // Mensajes privados
       var nq = poisson(esc * pf.quejas);
@@ -146,5 +168,5 @@
   quejas.sort(orden);
   resenas.sort(orden);
 
-  window.DEMO = { dias: dias, porDia: porDia, mesas: mesas, quejas: quejas, resenas: resenas };
+  window.DEMO = { real: false, dias: dias, porDia: porDia, mesas: mesas, horas: horas, quejas: quejas, resenas: resenas };
 })();

@@ -1,11 +1,11 @@
 /* Dashboard de reseñas.
    · Reputación en Google: datos REALES de config.js (locales[id].google).
-   · Actividad de las placas: datos SIMULADOS de window.DEMO.
+   · Actividad de las placas: contador real (Google Sheets) o datos de ejemplo.
    Filtros globales: local y estrellas (0 = general). Gráficas SVG sin librerías. */
 (function () {
-  var C = window.CONFIG, N = window.NECO, D = window.DEMO;
-  var ids = Object.keys(C.locales);
-  var filtro = "todos", est = 0, localMesas = ids[0];
+  var C = window.CONFIG, N = window.NECO, M = window.METRICAS;
+  var ids = M.ids, D = window.DEMO, carga = { modo: "demo", motivo: "cargando" };
+  var filtro = "todos", est = 0, localMesas = ids[0], localRival = ids[0];
   var COL = { 1: "#B9473A", 2: "#E08E6D", 3: "#CFC8BB", 4: "#93AE9A", 5: "#4F6154" };
   var RAMPA = ["#EEF2EF", "#D3DED6", "#B2C5B7", "#8FA997", "#6E8273", "#55685A", "#3D4C41"];
   var $ = function (id) { return document.getElementById(id); };
@@ -19,31 +19,9 @@
   var fDia = function (iso) { return new Intl.DateTimeFormat("es-ES", { weekday: "short", day: "numeric", month: "short" }).format(N.fechaDeIso(iso)).replace(/\./g, ""); };
   var activos = function () { return filtro === "todos" ? ids : [filtro]; };
   var etqEst = function (k) { return k + "★"; };
-
-  /* ======================= cálculos con datos reales ======================= */
-  function agregado(lista) {
-    var e = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 }, n = 0, s = 0;
-    lista.forEach(function (id) {
-      var g = C.locales[id].google;
-      for (var k = 1; k <= 5; k++) { e[k] += g.estrellas[k]; n += g.estrellas[k]; s += k * g.estrellas[k]; }
-    });
-    return { e: e, n: n, s: s, media: n ? s / n : 0 };
-  }
-
-  /* Nota visible (1 decimal) y reseñas necesarias para cambiarla */
-  function umbrales(a) {
-    var vis = Math.round(a.media * 10) / 10, arriba = vis + .05, abajo = vis - .05;
-    return {
-      vis: vis,
-      n5: Math.max(0, Math.ceil((arriba * a.n - a.s) / (5 - arriba) - 1e-9)),
-      n1: Math.floor((a.s - abajo * a.n) / (abajo - 1)) + 1,
-    };
-  }
-
-  /* Reseñas nuevas simuladas de los últimos 30 días */
-  function nuevas(lista, k) {
-    return D.resenas.filter(function (r) { return lista.indexOf(r.local) !== -1 && (!k || r.estrellas === k); });
-  }
+  var agregado = M.agregado, umbrales = M.umbrales;
+  var nuevas = function (lista, k) { return M.nuevas(D, lista, k); };
+  var esReal = function () { return carga.modo === "real"; };
 
   /* ======================= filtros ======================= */
   function renderFiltros() {
@@ -56,10 +34,14 @@
       return '<button type="button" data-e="' + x[0] + '" aria-pressed="' + (est === x[0]) + '">' +
         (x[0] ? '<i style="background:' + COL[x[0]] + '"></i>' : '') + x[1] + '</button>';
     }).join("");
+    var q = new URLSearchParams();
+    if (filtro !== "todos") q.set("local", filtro);
+    if (!esReal()) q.set("demo", "1");
+    $("btn-informe").href = "informe.html" + (q.toString() ? "?" + q : "");
   }
   document.addEventListener("click", function (e) {
     var f = e.target.closest("[data-f]");
-    if (f) { filtro = f.getAttribute("data-f"); if (filtro !== "todos") localMesas = filtro; render(); return; }
+    if (f) { filtro = f.getAttribute("data-f"); if (filtro !== "todos") { localMesas = filtro; localRival = filtro; } render(); return; }
     var s = e.target.closest("[data-e]");
     if (s) { var v = +s.getAttribute("data-e"); est = est === v && v ? 0 : v; render(); return; }
     var r = e.target.closest("[data-responder]");
@@ -77,11 +59,9 @@
   /* ======================= REPUTACIÓN (REAL) ======================= */
   function renderReal() {
     var lista = activos(), a = agregado(lista), u = umbrales(a);
-    var fecha = C.locales[ids[0]].google.fecha;
-    $("fecha-real").textContent = "Dato real · Google Maps · " + N.fechaDeIso(fecha).toLocaleDateString("es-ES");
+    $("fecha-real").textContent = "Dato real · Google Maps · " + N.fechaDeIso(C.locales[ids[0]].google.fecha).toLocaleDateString("es-ES");
     var ambito = filtro === "todos" ? "los 4 locales" : C.locales[filtro].nombre;
 
-    // --- nota principal ---
     if (!est) {
       $("hero-nota").innerHTML =
         '<p class="hn-et">Nota en Google · ' + esc(ambito) + '</p>' +
@@ -94,11 +74,9 @@
         '<p class="hn-sub">del total de ' + num(a.n) + ' reseñas · nota media ' + dec(a.media, 2) + '</p>';
     }
 
-    // --- KPI de calidad ---
     var k;
     if (!est) {
-      var sat = a.e[4] + a.e[5], cri = a.e[1] + a.e[2];
-      var neto = (a.e[5] - cri) / a.n * 100;
+      var sat = a.e[4] + a.e[5], cri = a.e[1] + a.e[2], neto = (a.e[5] - cri) / a.n * 100;
       k = [
         ["Clientes satisfechos", pct(sat, a.n), "Reseñas de 4 y 5★ (" + num(sat) + ")", ""],
         ["Críticas", pct(cri, a.n), "Reseñas de 1 y 2★ (" + num(cri) + ")", cri / a.n > .12 ? "mal" : ""],
@@ -108,8 +86,7 @@
     } else {
       var share = function (id) { var x = agregado([id]); return x.e[est] / x.n; };
       var orden = ids.slice().sort(function (p, q) { return share(q) - share(p); });
-      var red = agregado(ids), efecto = (est - a.media) / (a.n + 1);
-      var ultimo = orden[orden.length - 1];
+      var red = agregado(ids), efecto = (est - a.media) / (a.n + 1), ultimo = orden[orden.length - 1];
       var t4 = est < a.media
         ? ["Para compensar una de " + etqEst(est), dec((a.media - est) / (5 - a.media), 1) + " de 5★", "Hacen falta para que la nota no baje", ""]
         : ["Para subir la nota visible", num(u.n5) + " de 5★", "De " + dec(u.vis, 1) + " a " + dec(u.vis + .1, 1) + " en " + esc(ambito), ""];
@@ -126,9 +103,11 @@
     }
     $("kpis-real").innerHTML = k.map(kpi).join("");
 
+    renderRecs(lista);
     renderHisto(a);
     renderComparativa();
     renderObjetivos();
+    renderRivales();
     renderTemas(lista);
   }
 
@@ -141,7 +120,16 @@
     return '<div class="kpi' + (x[3] ? " kpi-" + x[3] : "") + '"><div class="k-et">' + x[0] + '</div><div class="k-val">' + x[1] + '</div><div class="k-sub">' + x[2] + '</div></div>';
   }
 
-  /* Histograma tipo Google: filas clicables */
+  var ICO_REC = { riesgo: "⚠", oportunidad: "🎯", competencia: "🏁", accion: "✔", info: "ℹ" };
+  var TXT_REC = { riesgo: "Riesgo", oportunidad: "Oportunidad", competencia: "Competencia", accion: "Acción", info: "Dato" };
+  function renderRecs(lista) {
+    var r = M.recomendaciones(D, lista);
+    $("recs").innerHTML = r.length ? r.map(function (x) {
+      return '<li class="rec rec-' + x.tipo + '"><span class="rec-ico" aria-hidden="true">' + ICO_REC[x.tipo] + '</span>' +
+        '<div><span class="rec-tipo">' + TXT_REC[x.tipo] + '</span><p>' + esc(x.texto) + '</p></div></li>';
+    }).join("") : '<li class="rec"><div><p>Sin alertas: todo en orden.</p></div></li>';
+  }
+
   function renderHisto(a) {
     var max = Math.max(a.e[1], a.e[2], a.e[3], a.e[4], a.e[5]) || 1;
     $("g-histo").innerHTML = '<div class="histo">' + [5, 4, 3, 2, 1].map(function (k) {
@@ -153,7 +141,6 @@
     }).join("") + '</div>';
   }
 
-  /* Barras 100 % apiladas por local */
   function renderComparativa() {
     $("comp-sub").textContent = est ? "Porcentaje de reseñas de " + etqEst(est) + " en cada local" : "Cómo se reparten las estrellas en cada local";
     $("g-comp").innerHTML = '<div class="comp">' + ids.map(function (id) {
@@ -167,7 +154,7 @@
     }).join("") + '</div>';
     var ley = [5, 4, 3, 2, 1].map(function (k) { return '<span><i class="sw sw-est" style="background:' + COL[k] + '"></i>' + etqEst(k) + '</span>'; }).join("");
     $("ley-est").innerHTML = ley;
-    $("ley-est-2").innerHTML = est ? '<span><i class="sw sw-est" style="background:' + COL[est] + '"></i>' + etqEst(est) + '</span>' : ley;
+    $("ley-est-2").innerHTML = esReal() ? "" : est ? '<span><i class="sw sw-est" style="background:' + COL[est] + '"></i>' + etqEst(est) + '</span>' : ley;
   }
   $("g-comp").addEventListener("pointermove", function (e) {
     var s = e.target.closest("[data-tip-k]");
@@ -181,32 +168,48 @@
     if (s) { var v = +s.getAttribute("data-tip-k"); est = est === v ? 0 : v; render(); }
   });
 
-  /* Objetivos de nota: lo que falta para subir y el margen antes de bajar */
   function renderObjetivos() {
     var filas = activos().map(function (id) {
       var a = agregado([id]), u = umbrales(a);
       var nr = nuevas([id]), m = nr.length, sm = nr.reduce(function (s, r) { return s + r.estrellas; }, 0);
-      var arriba = u.vis + .05, plazo = "–";
+      var arriba = u.vis + .05, plazo = esReal() ? "fase 2" : "–";
       if (m && sm / m > arriba) {
         var meses = (arriba * a.n - a.s) / (sm - arriba * m);
         plazo = meses <= 0 ? "ya" : meses < 1 ? "≈ " + Math.max(1, Math.round(meses * 30 / 7)) + " semanas" : meses < 12 ? "≈ " + dec(meses, 1) + " meses" : "≈ " + dec(meses / 12, 1) + " años";
       }
-      var posicion = (a.media - (u.vis - .05)) / .1 * 100;   // posición dentro de la franja de la nota visible
-      var riesgo = u.n1 < 25;
+      var posicion = (a.media - (u.vis - .05)) / .1 * 100;
       return '<tr><td><b>' + esc(C.locales[id].corto) + '</b></td>' +
         '<td class="num"><b>' + dec(u.vis, 1) + '</b></td>' +
         '<td class="num">' + dec(a.media, 3) + '</td>' +
         '<td><div class="franja"><span style="left:' + Math.max(2, Math.min(98, posicion)) + '%"></span></div>' +
         '<small class="franja-et"><span>' + dec(u.vis - .05, 2) + '</span><span>' + dec(u.vis + .05, 2) + '</span></small></td>' +
         '<td class="num"><b>' + num(u.n5) + '</b> de 5★<br><small>para ver ' + dec(u.vis + .1, 1) + '</small></td>' +
-        '<td class="num' + (riesgo ? " txt-mal" : "") + '"><b>' + num(u.n1) + '</b> de 1★<br><small>para caer a ' + dec(u.vis - .1, 1) + '</small></td>' +
-        '<td class="num">' + plazo + '<br><small class="tag-ej-txt">ejemplo</small></td></tr>';
+        '<td class="num' + (u.n1 < 25 ? " txt-mal" : "") + '"><b>' + num(u.n1) + '</b> de 1★<br><small>para caer a ' + dec(u.vis - .1, 1) + '</small></td>' +
+        '<td class="num">' + plazo + '<br><small class="tag-ej-txt">' + (esReal() ? "con API Google" : "ejemplo") + '</small></td></tr>';
     }).join("");
     $("t-objetivos").innerHTML = '<table class="tabla"><thead><tr><th>Local</th><th class="num">Visible</th><th class="num">Exacta</th><th>Posición dentro de la nota</th>' +
       '<th class="num">Para subir</th><th class="num">Margen antes de bajar</th><th class="num">Al ritmo de las placas</th></tr></thead><tbody>' + filas + '</tbody></table>';
   }
 
-  /* Temas mencionados (reales). Se suman entre locales si hay varios. */
+  /* Competencia: diagrama de puntos sobre una escala de 3,5 a 5 */
+  function renderRivales() {
+    var sel = $("rival-sel");
+    sel.innerHTML = ids.map(function (id) { return '<option value="' + id + '"' + (id === localRival ? " selected" : "") + '>' + esc(C.locales[id].corto) + '</option>'; }).join("");
+    $("rival-sel-cont").hidden = filtro !== "todos";
+    var rk = M.ranking(localRival), lo = 3.5, hi = 5;
+    $("rival-sub").textContent = "Puesto " + rk.puesto + " de " + rk.total + " por nota · " + rk.puestoVolumen + "º por número de reseñas · media de la zona " + dec(rk.media, 2);
+    var marcas = [3.5, 4, 4.5, 5].map(function (v) { return '<span style="left:' + ((v - lo) / (hi - lo) * 100) + '%">' + dec(v, 1) + '</span>'; }).join("");
+    var mediaX = (rk.media - lo) / (hi - lo) * 100;
+    $("g-rivales").innerHTML = '<div class="rivales">' + rk.filas.map(function (f) {
+      var x = Math.max(0, Math.min(100, (f.nota - lo) / (hi - lo) * 100));
+      return '<div class="r-fila' + (f.neco ? " neco" : "") + '"><span class="r-nombre">' + esc(f.nombre) + '<small>' + esc(f.tipo) + '</small></span>' +
+        '<span class="r-pista"><i class="r-media" style="left:' + mediaX + '%"></i><i class="r-punto" style="left:' + x + '%"></i></span>' +
+        '<span class="r-val"><b>' + dec(f.nota, 1) + '</b><small>' + (f.resenas >= 1000 && !f.neco ? "≈" : "") + num(f.resenas) + '</small></span></div>';
+    }).join("") + '<div class="r-fila r-eje"><span></span><span class="r-pista">' + marcas + '</span><span></span></div></div>' +
+      '<p class="nota-graf"><i class="r-media-ley"></i> media de la competencia · cifras con «≈»: Google las redondea</p>';
+  }
+  $("rival-sel").addEventListener("change", function (e) { localRival = e.target.value; renderRivales(); });
+
   function renderTemas(lista) {
     var t = {};
     lista.forEach(function (id) {
@@ -224,45 +227,118 @@
     }).join("");
   }
 
-  /* ======================= ACTIVIDAD DE LAS PLACAS (EJEMPLO) ======================= */
-  function serieDiaria() {
-    return D.dias.map(function (iso, i) {
-      var r = { iso: iso, escaneos: 0, nfc: 0, qr: 0, clics: 0, resenas: 0, porEstrella: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 } };
-      activos().forEach(function (id) {
-        var d = D.porDia[id][i];
-        r.escaneos += d.escaneos; r.nfc += d.nfc; r.qr += d.qr; r.clics += d.clics; r.resenas += d.resenas;
-        for (var k = 1; k <= 5; k++) r.porEstrella[k] += d.porEstrella[k];
-      });
-      return r;
+  /* ======================= ACTIVIDAD DE LAS PLACAS ======================= */
+  function renderEstadoContador() {
+    var t = $("periodo"), caja = $("estado-contador"), ley = $("tag-placas-ley");
+    var rango = fCorta(D.dias[0]) + " – " + fCorta(D.dias[D.dias.length - 1]);
+    if (esReal()) {
+      t.className = ley.className = "tag tag-real";
+      t.textContent = "Real · contador · últimos 30 días · " + rango;
+      ley.textContent = "Real · contador";
+      caja.innerHTML = '<p class="aviso-contador ok">Conectado al contador real (Google Sheets) · actualizado a las ' +
+        new Date(carga.generado || Date.now()).toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" }) +
+        '. Las reseñas nuevas y las respuestas llegarán con la API de Google (fase 2).</p>';
+      return;
+    }
+    t.className = ley.className = "tag tag-ej";
+    t.textContent = "Ejemplo · últimos 30 días · " + rango;
+    ley.textContent = "Ejemplo · simulado";
+    var ep = C.contador && C.contador.endpoint;
+    var msg = { "sin-clave": "El contador está configurado. Escribe la clave del panel para ver los datos reales.",
+      "clave-incorrecta": "La clave no es correcta. Escríbela otra vez.",
+      "sin-conexion": "No se ha podido conectar con el contador; se muestran datos de ejemplo.",
+      "error": "El contador ha respondido con un error; se muestran datos de ejemplo." }[carga.motivo];
+    caja.innerHTML = ep && msg
+      ? '<form class="aviso-contador" id="f-clave"><span>' + msg + '</span><input type="password" id="clave" placeholder="Clave del panel" autocomplete="current-password"><button type="submit">Conectar</button></form>'
+      : "";
+    var f = $("f-clave");
+    if (f) f.addEventListener("submit", function (e) {
+      e.preventDefault();
+      M.guardarClave($("clave").value.trim());
+      iniciar();
     });
   }
 
-  function renderPlacas(serie) {
-    $("periodo").textContent = "Ejemplo · últimos 30 días · " + fCorta(D.dias[0]) + " – " + fCorta(D.dias[D.dias.length - 1]);
+  function renderPlacas() {
+    var serie = M.serieDiaria(D, activos());
+    renderEstadoContador();
     var t = serie.reduce(function (s, d) { s.e += d.escaneos; s.n += d.nfc; s.c += d.clics; return s; }, { e: 0, n: 0, c: 0 });
-    var todas = nuevas(activos()), sel = nuevas(activos(), est);
-    var media = todas.length ? todas.reduce(function (s, r) { return s + r.estrellas; }, 0) / todas.length : 0;
-    var hist = agregado(activos()).media;
-    var resp = sel.filter(function (r) { return r.respondida; });
-    var horas = resp.length ? resp.reduce(function (s, r) { return s + r.horasRespuesta; }, 0) / resp.length : 0;
     var quejas = D.quejas.filter(function (q) { return activos().indexOf(q.local) !== -1; });
-
-    $("kpis-placas").innerHTML = [
+    var pend = quejas.filter(function (q) { return q.estado === "Pendiente"; }).length;
+    var tiles = [
       ["Escaneos", num(t.e), pct(t.n, t.e) + " NFC · " + pct(t.e - t.n, t.e) + " QR", ""],
       ["Clics a Google", num(t.c), pct(t.c, t.e) + " de los escaneos", ""],
-      [est ? "Reseñas nuevas de " + etqEst(est) : "Reseñas nuevas", num(sel.length), est ? pct(sel.length, todas.length) + " de las nuevas" : pct(todas.length, t.c) + " de los clics acaban en reseña", ""],
-      ["Nota de las reseñas nuevas", dec(media, 2) + " ★", (media >= hist ? "+" : "") + dec(media - hist, 2) + " vs histórica (" + dec(hist, 2) + ")", media >= hist ? "bien" : "mal"],
-      [est ? "Respondidas (" + etqEst(est) + ")" : "Respondidas", pct(resp.length, sel.length), sel.length - resp.length ? (sel.length - resp.length) + " sin responder" : "Todas respondidas", sel.length && resp.length / sel.length < .8 ? "mal" : ""],
-      ["Tiempo medio de respuesta", resp.length ? (horas < 24 ? dec(horas, 0) + " h" : dec(horas / 24, 1) + " días") : "–", "Objetivo: < 24 h (< 6 h en negativas)", horas > 24 ? "mal" : ""],
-    ].map(kpi).join("");
+    ];
+    if (esReal()) {
+      var fase2 = ["", "—", "Con la API de Google (fase 2)", ""];
+      tiles.push(["Reseñas nuevas"].concat(fase2.slice(1)), ["Nota de las reseñas nuevas"].concat(fase2.slice(1)),
+        ["Mensajes privados", num(quejas.length), pend + " por atender", pend ? "mal" : ""],
+        ["Escaneos por día", dec(t.e / D.dias.length, 1), "Media de los últimos 30 días", ""]);
+    } else {
+      var todas = nuevas(activos()), sel = nuevas(activos(), est);
+      var media = todas.length ? todas.reduce(function (s, r) { return s + r.estrellas; }, 0) / todas.length : 0;
+      var hist = agregado(activos()).media;
+      var resp = sel.filter(function (r) { return r.respondida; });
+      var horas = resp.length ? resp.reduce(function (s, r) { return s + r.horasRespuesta; }, 0) / resp.length : 0;
+      tiles.push(
+        [est ? "Reseñas nuevas de " + etqEst(est) : "Reseñas nuevas", num(sel.length), est ? pct(sel.length, todas.length) + " de las nuevas" : pct(todas.length, t.c) + " de los clics acaban en reseña", ""],
+        ["Nota de las reseñas nuevas", dec(media, 2) + " ★", (media >= hist ? "+" : "") + dec(media - hist, 2) + " vs histórica (" + dec(hist, 2) + ")", media >= hist ? "bien" : "mal"],
+        [est ? "Respondidas (" + etqEst(est) + ")" : "Respondidas", pct(resp.length, sel.length), sel.length - resp.length ? (sel.length - resp.length) + " sin responder" : "Todas respondidas", sel.length && resp.length / sel.length < .8 ? "mal" : ""],
+        ["Tiempo medio de respuesta", resp.length ? (horas < 24 ? dec(horas, 0) + " h" : dec(horas / 24, 1) + " días") : "–", "Objetivo: < 24 h (< 6 h en negativas)", horas > 24 ? "mal" : ""]);
+    }
+    $("kpis-placas").innerHTML = tiles.map(kpi).join("");
 
+    renderEmbudo();
+    renderHoras();
     renderDias(serie);
     renderResenasDia(serie);
     renderLocales();
     renderMesas();
-    renderListaResenas(sel);
+    renderListaResenas();
+    renderTemasQueja();
     renderQuejas(quejas);
   }
+
+  function renderEmbudo() {
+    var pasos = M.embudo(D, activos()), base = pasos[0].n || 1;
+    $("g-embudo").innerHTML = '<div class="embudo">' + pasos.map(function (p, i) {
+      var previo = i ? pasos[i - 1].n : null;
+      if (p.n == null) {
+        return '<div class="e-fila fase2-fila"><span class="e-paso">' + p.paso + '</span><span class="e-pista"><span class="e-vacia">Con la API de Google (fase 2)</span></span><span class="e-val">—</span></div>';
+      }
+      var conv = previo ? pct(p.n, previo) + " del paso anterior" : "100 %";
+      return '<div class="e-fila"><span class="e-paso">' + p.paso + '</span>' +
+        '<span class="e-pista"><span class="e-barra" style="width:' + Math.max(1.5, p.n / base * 100) + '%"></span></span>' +
+        '<span class="e-val"><b>' + num(p.n) + '</b><small>' + conv + '</small></span></div>';
+    }).join("") + '</div>' +
+      (pasos[2].n != null ? '<p class="nota-graf">De cada 100 personas que escanean, <b>' + Math.round(pasos[2].n / base * 100) + '</b> publican una reseña en Google.</p>' : '');
+  }
+
+  function renderHoras() {
+    var m = M.horas(D, activos()), dias = [1, 2, 3, 4, 5, 6, 0], nombres = ["L", "M", "X", "J", "V", "S", "D"];
+    var h0 = 7, h1 = 23, max = 0, pico = null;
+    dias.forEach(function (d) { for (var h = h0; h <= h1; h++) if (m[d][h] > max) { max = m[d][h]; pico = [d, h]; } });
+    var largos = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];
+    $("horas-sub").textContent = max ? "Hora punta: " + largos[pico[0]] + " a las " + pico[1] + ":00 · " + num(max) + " escaneos en 30 días" : "Sin escaneos en este periodo";
+    var cab = '<span></span>';
+    for (var h = h0; h <= h1; h++) cab += '<span class="hm-h">' + (h % 2 ? "" : h) + '</span>';
+    $("g-horas").innerHTML = '<div class="hm" style="--cols:' + (h1 - h0 + 1) + '">' + cab + dias.map(function (d, i) {
+      var fila = '<span class="hm-d">' + nombres[i] + '</span>';
+      for (var h = h0; h <= h1; h++) {
+        var v = m[d][h], k = v ? Math.min(RAMPA.length - 1, 1 + Math.floor(v / max * (RAMPA.length - 2) + .0001)) : 0;
+        fila += '<span class="hm-c" data-d="' + d + '" data-h="' + h + '" data-v="' + v + '" style="background:' + (v ? RAMPA[k] : "#F6F2EB") + '"></span>';
+      }
+      return fila;
+    }).join("") + '</div>' +
+      '<div class="mesas-pie"><span>Útil para saber cuándo recordar la placa en caja</span><span class="escala">Menos ' + RAMPA.slice(1).map(function (c) { return '<i style="background:' + c + '"></i>'; }).join("") + ' Más</span></div>';
+  }
+  $("g-horas").addEventListener("pointermove", function (e) {
+    var c = e.target.closest(".hm-c");
+    if (!c) return ocultarTip();
+    var largos = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+    verTip(e, '<b>' + largos[+c.getAttribute("data-d")] + ' · ' + c.getAttribute("data-h") + ':00</b>' + num(+c.getAttribute("data-v")) + ' escaneos en 30 días');
+  });
+  $("g-horas").addEventListener("pointerleave", ocultarTip);
 
   function pasoBonito(max, n) {
     var bruto = max / n, mag = Math.pow(10, Math.floor(Math.log10(bruto))), r = bruto / mag;
@@ -338,18 +414,19 @@
         '<div class="fila"><span><i style="background:var(--serie-2)"></i>Clics a Google</span><span>' + num(d.clics) + ' (' + pct(d.clics, d.escaneos) + ')</span></div>' +
         '<div class="fila" style="opacity:.7"><span>NFC / QR</span><span>' + num(d.nfc) + ' / ' + num(d.qr) + '</span></div>';
     });
-    $("t-dias").innerHTML = '<table><thead><tr><th>Fecha</th><th class="num">Escaneos</th><th class="num">NFC</th><th class="num">QR</th><th class="num">Clics Google</th><th class="num">Reseñas</th></tr></thead><tbody>' +
+    $("t-dias").innerHTML = '<table><thead><tr><th>Fecha</th><th class="num">Escaneos</th><th class="num">NFC</th><th class="num">QR</th><th class="num">Clics Google</th>' + (esReal() ? '' : '<th class="num">Reseñas</th>') + '</tr></thead><tbody>' +
       serie.slice().reverse().map(function (d) {
-        return '<tr><td>' + fDia(d.iso) + '</td><td class="num">' + num(d.escaneos) + '</td><td class="num">' + num(d.nfc) + '</td><td class="num">' + num(d.qr) + '</td><td class="num">' + num(d.clics) + '</td><td class="num">' + num(d.resenas) + '</td></tr>';
+        return '<tr><td>' + fDia(d.iso) + '</td><td class="num">' + num(d.escaneos) + '</td><td class="num">' + num(d.nfc) + '</td><td class="num">' + num(d.qr) + '</td><td class="num">' + num(d.clics) + '</td>' + (esReal() ? '' : '<td class="num">' + num(d.resenas) + '</td>') + '</tr>';
       }).join("") + '</tbody></table>';
   }
 
-  /* Reseñas nuevas por día, apiladas por estrellas (o solo la seleccionada) */
   function renderResenasDia(serie) {
-    var cont = $("g-resenas"), ks = est ? [est] : [5, 4, 3, 2, 1];
-    var total = function (d) { return ks.reduce(function (s, k) { return s + d.porEstrella[k]; }, 0); };
+    var cont = $("g-resenas");
     $("t-resenas-dia").textContent = est ? "Reseñas nuevas de " + etqEst(est) + " por día" : "Reseñas nuevas por día";
-    var g = ejes(serie, cont, Math.max.apply(null, serie.map(total))), s = g.svg, base = g.m.t + g.ih;
+    if (esReal()) { cont.innerHTML = '<p class="vacio-fase2">Las reseñas nuevas se leerán automáticamente de Google con la API del Perfil de Empresa (fase 2).</p>'; return; }
+    var ks = est ? [est] : [5, 4, 3, 2, 1];
+    var total = function (d) { return ks.reduce(function (s, k) { return s + d.porEstrella[k]; }, 0); };
+    var g = ejes(serie, cont, Math.max.apply(null, serie.map(total))), s = g.svg;
     serie.forEach(function (d, i) {
       var acum = 0, x0 = g.x(i) - g.bw / 2, visibles = ks.filter(function (k) { return d.porEstrella[k]; });
       visibles.forEach(function (k, j) {
@@ -386,12 +463,14 @@
     $("mesas-sel-cont").hidden = filtro !== "todos";
     var dm = D.mesas[localMesas], max = Math.max.apply(null, dm.mesas) || 1;
     var orden = dm.mesas.map(function (v, i) { return [i + 1, v]; }).sort(function (a, b) { return b[1] - a[1]; });
+    var sinUso = dm.mesas.filter(function (v) { return v <= max * .15; }).length;
     $("mesas-sub").textContent = C.locales[localMesas].nombre + " · " + dm.mesas.length + " mesas";
     $("g-mesas").innerHTML = '<div class="mesas">' + dm.mesas.map(function (v, i) {
       var k = Math.min(RAMPA.length - 1, Math.floor(v / max * (RAMPA.length - 1) + .0001));
       return '<div class="mesa" data-m="' + (i + 1) + '" data-v="' + v + '" style="background:' + RAMPA[k] + ';color:' + (k >= 4 ? "#fff" : "var(--tinta-2)") + '">' + (i + 1) + '</div>';
     }).join("") + '</div>' +
-      '<div class="mesas-pie"><span>Más escaneadas: <b>' + orden.slice(0, 3).map(function (o) { return "mesa " + o[0]; }).join(", ") + '</b> · Entrada: <b>' + num(dm.entrada) + '</b></span>' +
+      '<div class="mesas-pie"><span>Más escaneadas: <b>' + orden.slice(0, 3).map(function (o) { return "mesa " + o[0]; }).join(", ") + '</b> · Entrada: <b>' + num(dm.entrada) + '</b>' +
+      (sinUso ? ' · <span class="txt-aviso">' + sinUso + ' mesas casi sin escaneos: revisad la placa</span>' : '') + '</span>' +
       '<span class="escala">Menos ' + RAMPA.map(function (c) { return '<i style="background:' + c + '"></i>'; }).join("") + ' Más</span></div>';
   }
   $("mesas-sel").addEventListener("change", function (e) { localMesas = e.target.value; renderMesas(); });
@@ -402,7 +481,6 @@
   });
   $("g-mesas").addEventListener("pointerleave", ocultarTip);
 
-  /* Plantillas de respuesta según estrellas */
   function plantilla(r) {
     var nombre = r.autor.split(" ")[0], local = C.locales[r.local].nombre;
     if (r.estrellas >= 4) return "¡Muchas gracias, " + nombre + "! Nos alegra mucho que disfrutaras en " + local + ". Te esperamos pronto.";
@@ -410,8 +488,10 @@
     return "Sentimos mucho tu experiencia, " + nombre + ". No es lo que queremos para nuestros clientes. ¿Nos escribes a " + C.contacto.email + " para que podamos hablarlo? Gracias por avisarnos.";
   }
 
-  function renderListaResenas(sel) {
+  function renderListaResenas() {
     $("t-lista-resenas").textContent = est ? "Reseñas nuevas de " + etqEst(est) : "Reseñas nuevas";
+    if (esReal()) { $("l-resenas").innerHTML = '<p class="vacio-fase2">Con la API del Perfil de Empresa (fase 2) aquí aparecerán las reseñas nuevas de Google, con su plantilla de respuesta.</p>'; return; }
+    var sel = nuevas(activos(), est);
     $("l-resenas").innerHTML = sel.length ? sel.slice(0, 40).map(function (r) {
       var estado = r.respondida
         ? '<span class="estado e-resuelta">Respondida en ' + (r.horasRespuesta < 24 ? r.horasRespuesta + " h" : Math.round(r.horasRespuesta / 24) + " d") + '</span>'
@@ -425,12 +505,19 @@
     }).join("") : '<p class="sub">Sin reseñas nuevas en este periodo.</p>';
   }
 
+  function renderTemasQueja() {
+    var t = M.temasQueja(D, activos()), max = t.length ? t[0].n : 1, total = t.reduce(function (s, x) { return s + x.n; }, 0);
+    $("g-temas-queja").innerHTML = t.length ? '<div class="tq">' + t.map(function (x) {
+      return '<span class="tq-n">' + x.nombre + '</span><span class="tq-pista"><span style="width:' + (x.n / max * 100) + '%"></span></span><span class="tq-v">' + x.n + ' · ' + pct(x.n, total) + '</span>';
+    }).join("") + '</div>' : "";
+  }
+
   function renderQuejas(q) {
     $("l-quejas").innerHTML = q.length ? q.map(function (x) {
       return '<article class="qj"><div class="qj-cab"><b>' + fDia(x.iso) + ' · ' + x.hora + '</b><span>' + esc(C.locales[x.local].corto) +
-        (x.mesa ? ' · mesa ' + x.mesa : ' · entrada') + ' · ' + x.via + '</span><span class="cat">' + x.categoria + '</span>' +
+        (x.mesa ? ' · mesa ' + x.mesa : ' · entrada') + ' · ' + esc(x.via) + '</span><span class="cat">' + (M.CAT[x.categoria] || "Otro") + '</span>' +
         '<span class="estado e-' + x.estado.toLowerCase() + '">' + x.estado + '</span></div>' +
-        '<p>' + esc(x.texto) + '</p>' +
+        '<p>' + esc(x.texto || "") + '</p>' +
         '<div class="qj-cab" style="margin-top:4px">' + (x.contacto ? "Dejó contacto para respuesta" : "Anónimo") + '</div></article>';
     }).join("") : '<p class="sub">Sin mensajes en este periodo.</p>';
   }
@@ -450,12 +537,16 @@
   function render() {
     renderFiltros();
     renderReal();
-    renderPlacas(serieDiaria());
+    renderPlacas();
+  }
+  function iniciar() {
+    M.cargarDatos().then(function (r) { carga = r; D = r.datos; render(); });
   }
   var rt;
   addEventListener("resize", function () {
     clearTimeout(rt);
-    rt = setTimeout(function () { var s = serieDiaria(); renderDias(s); renderResenasDia(s); }, 120);
+    rt = setTimeout(function () { var s = M.serieDiaria(D, activos()); renderDias(s); renderResenasDia(s); }, 120);
   });
-  render();
+  render();      // primero con los datos de ejemplo, para que no haya pantalla en blanco
+  iniciar();     // y después, si hay contador, con los reales
 })();

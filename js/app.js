@@ -17,7 +17,7 @@
     mesa: mesaParam,
     via: viaParam === "nfc" || viaParam === "qr" ? viaParam : "",
     abierto: null,
-    queja: { texto: "", contacto: "", enviada: false, ficha: null },
+    queja: { texto: "", contacto: "", categoria: "", enviada: false, ficha: null },
     grupo: null,
   };
 
@@ -39,8 +39,8 @@
   /* Contador (fase 2). Sin endpoint configurado no envía nada. */
   function track(evento, datos) {
     var ep = C.contador && C.contador.endpoint;
-    var carga = Object.assign({ evento: evento, local: estado.localId, mesa: estado.mesa || null, via: estado.via || "enlace", t: Date.now() }, datos || {});
-    if (!ep) { if (window.console) console.debug("[demo] evento", carga); return; }
+    var carga = Object.assign({ evento: evento, local: estado.localId, mesa: estado.mesa || "", via: estado.via || "enlace", idioma: estado.lang, t: Date.now() }, datos || {});
+    if (!ep || !estado.localId) { if (window.console) console.debug("[demo] evento", carga); return; }
     try { navigator.sendBeacon(ep, JSON.stringify(carga)); } catch (e) {}
   }
 
@@ -122,7 +122,8 @@
     return "*Neco · Mensaje privado*\n" +
       "Local: " + l.nombre + "\n" +
       "Origen: " + origenTexto("es") + "\n" +
-      "Fecha: " + ahoraTexto("es") + "\n\n" +
+      "Fecha: " + ahoraTexto("es") + "\n" +
+      (q.categoria ? "Tema: " + window.I18N.es.cats[q.categoria] + "\n" : "") + "\n" +
       q.texto.trim() + "\n\n" +
       "Contacto: " + (q.contacto.trim() || "este WhatsApp") + notaIdioma();
   }
@@ -195,7 +196,8 @@
           '<span class="miniplatos" aria-hidden="true"><img src="img/plato-paella.webp" alt=""><img src="img/plato-ensalada.webp" alt=""><img src="img/plato-postres.webp" alt=""></span>' +
         '</a></div>' +
         acceso("alergenos", I.escudo, T("alergenos"), T("alergenosSub"),
-          '<p>' + T("alergenosTexto") + '</p><div class="nota-suave">' + T("alergenosFase2") + '</div>') +
+          '<p>' + T("alergenosTexto") + '</p>' +
+          '<a class="boton secundario" id="btn-alergenos" href="alergenos.html?local=' + estado.localId + '&lang=' + estado.lang + '">' + I.escudo.replace('<svg', '<svg style="width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8"') + T("alergenosVer") + '</a>') +
         acceso("grupos", I.tarta, T("grupos"), T("gruposSub"), '<div id="grupo-cont"></div>', "terracota") +
         acceso("horario", I.reloj, T("horario"), esc(l.direccion), htmlHorario(l)) +
       '</nav>' +
@@ -246,6 +248,7 @@
         htmlFicha(T("fichaQueja"), T("gerente") + " · " + l.nombre, [
           [T("fichaOrigen"), origenTexto()],
           [T("fichaRecibido"), q.ficha],
+          [T("fichaTema"), q.categoria ? T("cats")[q.categoria] : "—"],
           [T("fichaContacto"), q.contacto || T("fichaSinContacto")],
         ], q.texto);
     }
@@ -253,10 +256,14 @@
       '<p style="margin:0 0 12px;color:var(--tinta-2);font-size:15px">' + T(wa ? "quejaIntroWa" : "quejaIntro") + '</p>' +
       '<label class="campo"><span>' + T("quejaTexto") + '</span>' +
         '<textarea name="texto" required maxlength="1500" placeholder="' + T("quejaPlaceholder") + '">' + esc(q.texto) + '</textarea></label>' +
+      '<div class="campo"><span>' + T("quejaTema") + '</span><div class="cats" role="group">' +
+        Object.keys(T("cats")).map(function (k) {
+          return '<button type="button" data-cat="' + k + '" aria-pressed="' + (q.categoria === k) + '">' + T("cats")[k] + '</button>';
+        }).join("") + '</div></div>' +
       '<label class="campo"><span>' + T("quejaContacto") + '</span>' +
         '<input name="contacto" autocomplete="email" maxlength="120" value="' + esc(q.contacto) + '"></label>' +
       '<button class="boton' + (wa ? " wa" : "") + '" type="submit"' + (q.texto.trim() ? "" : " disabled") + '>' + (wa ? I.whatsapp + T("quejaEnviarWa") : T("quejaEnviar")) + '</button>' +
-      (wa ? '<p class="pista">' + T("waAviso") + '</p>' : '') +
+      '<p class="pista">' + (wa ? T("waAviso") + " " : "") + T("privacidad") + '</p>' +
       '</form>';
   }
 
@@ -452,6 +459,15 @@
   app.addEventListener("click", function (e) {
     if (e.target.closest("#btn-google")) track("clic_google");
     if (e.target.closest("#btn-platos")) track("clic_platos");
+    if (e.target.closest("#btn-alergenos")) track("ver_alergenos");
+
+    var cat = e.target.closest("[data-cat]");
+    if (cat) {
+      var k = cat.getAttribute("data-cat");
+      estado.queja.categoria = estado.queja.categoria === k ? "" : k;
+      cat.parentNode.querySelectorAll("button").forEach(function (b) { b.setAttribute("aria-pressed", String(b.getAttribute("data-cat") === estado.queja.categoria)); });
+      return;
+    }
 
     var g = estado.grupo;
     var paso = e.target.closest("[data-paso]");
@@ -512,7 +528,12 @@
         estado.queja.url = urlWa(estado.localId, estado.queja.mensajeWa);
         abrirWa(estado.queja.url);
       }
-      track("queja", { contacto: !!estado.queja.contacto, whatsapp: !!estado.queja.url });
+      var guardar = C.contador && C.contador.guardarMensajes !== false;
+      track("queja", {
+        categoria: estado.queja.categoria,
+        texto: guardar ? estado.queja.texto.trim() : "",
+        contacto: guardar ? estado.queja.contacto.trim() : (estado.queja.contacto ? "si" : ""),
+      });
       document.querySelector("#d-queja .panel-interior").innerHTML = htmlQueja();
     }
     if (f.id === "f-grupo") {
@@ -526,7 +547,12 @@
         g.url = urlWa(g.local, g.mensajeWa);
         abrirWa(g.url);
       }
-      track("grupo", { localEvento: g.local, personas: g.ultimo.personas, importe: g.ultimo.total });
+      var guardarG = C.contador && C.contador.guardarMensajes !== false;
+      track("grupo", {
+        categoria: g.tipo, personas: g.ultimo.personas, importe: g.ultimo.total,
+        texto: guardarG ? C.locales[g.local].corto + " · " + g.fecha + " · " + g.servicio + (g.comentarios.trim() ? " · " + g.comentarios.trim() : "") : "",
+        contacto: guardarG ? g.nombre.trim() + " · " + g.contacto.trim() : "",
+      });
       renderGrupo();
       document.getElementById("d-grupos").scrollIntoView({ behavior: "smooth", block: "start" });
     }

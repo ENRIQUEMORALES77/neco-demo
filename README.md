@@ -14,7 +14,9 @@ Es todo HTML, CSS y JavaScript estático: no tiene servidor ni claves de API. Fu
 | Archivo | Para qué sirve |
 |---|---|
 | `index.html` | Página de destino (lo que ve el cliente). Se abre con `?local=ruzafa&mesa=12` |
-| `panel.html` | **Dashboard de reseñas**: reputación real en Google + actividad de las placas (simulada) |
+| `panel.html` | **Dashboard de reseñas**: reputación real en Google, competencia, prioridades automáticas y actividad de las placas |
+| `informe.html` | **Informe mensual** de 2 páginas A4 para imprimir o guardar en PDF (se abre desde el panel) |
+| `alergenos.html` | **Carta de alérgenos** con filtros por los 14 alérgenos y dieta (datos de ejemplo en `js/carta.js`) |
 | `presentacion.html` | **Modo presentación** para la reunión: móvil simulado, QR grande para que el gerente lo pruebe con su móvil y panel |
 | `expositor.html` | Plantilla imprimible del expositor de mesa A6, con un QR por local o por mesa |
 | `expositores-A6.pdf` / `expositores-4xA4.pdf` | Expositores de entrada de los 4 locales, listos para imprimir |
@@ -23,6 +25,8 @@ Es todo HTML, CSS y JavaScript estático: no tiene servidor ni claves de API. Fu
 | `config.js` | **Toda** la configuración: locales, Place IDs, horarios, tarifas, festivos y enlaces |
 | `js/i18n.js` | Textos de la interfaz en español e inglés |
 | `tools/generar_qr.py` | Vuelve a generar los QR y `nfc-urls.csv` a partir de `config.js` |
+| `tools/apps-script/Codigo.gs` | **Contador real**: script de Google Apps Script para guardar escaneos, clics y mensajes en Google Sheets |
+| `js/metricas.js` | Cálculos compartidos por el panel y el informe (umbrales de nota, competencia, embudo, recomendaciones) |
 
 ---
 
@@ -150,13 +154,13 @@ La página está diseñada para cumplir la política de contenido de reseñas de
 
 ## 7. Dashboard de reseñas (`panel.html`)
 
-Dos bloques, siempre marcados con su etiqueta: **Dato real** (verde) o **Ejemplo** (ámbar).
+Cada bloque lleva su etiqueta: **Dato real** (verde) o **Ejemplo** (ámbar). Si el contador está conectado, la actividad de las placas también pasa a «Real · contador».
 
-**Filtros** (arriba, fijos): **General** o **1★–5★**, y **local**. Afectan a todo el panel. También se filtra pulsando una fila del reparto de estrellas o un tramo de la comparativa.
+**Filtros** (arriba, fijos): **General** o **1★–5★**, y **local**. Afectan a todo el panel. También se filtra pulsando una fila del reparto de estrellas o un tramo de la comparativa. El botón **Informe mensual** abre `informe.html` con el mismo filtro de local.
 
 ### Reputación en Google — dato real
 
-Sale de `config.js` → `google` de cada local: nota, número de reseñas, reparto por estrellas y temas. Se tomaron de Google Maps el 09/10/2026.
+Sale de `config.js` → `google` de cada local: nota, número de reseñas, reparto por estrellas, temas y competencia cercana. Se tomaron de Google Maps el 09–10/10/2026.
 
 - **Nota visible y media exacta.** Google redondea a un decimal: Alfafar (3,972) y El Saler (3,985) muestran «4,0», pero están en la parte baja de esa franja.
 - **KPI de calidad (vista General):**
@@ -167,49 +171,99 @@ Sale de `config.js` → `google` de cada local: nota, número de reseñas, repar
   - Peso de esas estrellas en el total y local con más y con menos.
   - Efecto de cada nueva reseña de ese tipo en la media: una 4★ también la baja si la media supera 4.
   - Cuántas 5★ compensan una de ese tipo.
+- **Prioridades de esta semana:** recomendaciones automáticas, basadas en reglas, con las cifras del panel:
+  - riesgo de bajar de nota,
+  - oportunidad de subir,
+  - posición frente a la competencia,
+  - local con más 1★,
+  - reseñas sin responder,
+  - conversión baja.
 - **Comparativa por local:** reparto en barras 100 %.
-- **Objetivos de nota:** cuántas 5★ faltan para que Google muestre la décima siguiente, y cuántas 1★ la harían bajar. El plazo «al ritmo de las placas» usa los datos de ejemplo.
+- **Objetivos de nota:** cuántas 5★ faltan para que Google muestre la décima siguiente, y cuántas 1★ la harían bajar. El plazo «al ritmo de las placas» usa las reseñas nuevas (ejemplo, o la API en la fase 2).
+- **Competencia cercana:** nota y reseñas de los buffets y restaurantes de la zona de cada local, con el puesto de Neco por nota y por volumen. Las cifras de más de 1.000 reseñas son aproximadas, porque Google las redondea.
 - **De qué hablan los clientes:** los temas que detecta Google y en cuántas reseñas aparecen.
 
-### Actividad de las placas — ejemplo
+### Actividad de las placas — contador real o ejemplo
 
-Son 30 días simulados con `js/datos-demo.js`, con una semilla fija (siempre salen las mismas cifras):
+- KPI: escaneos (NFC/QR), clics a Google, reseñas nuevas y su nota frente a la histórica, % respondidas y tiempo de respuesta.
+- **Embudo:** escaneos → clics a Google → reseñas publicadas → respondidas, con la conversión entre pasos.
+- **Horas punta:** mapa de día por hora (sirve para saber cuándo recordar la placa en caja).
+- Escaneos y clics por día, reseñas nuevas por día y por estrellas, escaneos por local y por mesa. Avisa de las mesas casi sin escaneos.
+- Reseñas nuevas con botón **Responder** (plantilla según las estrellas, lista para copiar).
+- Mensajes privados con su **tema** (comida, reposición, limpieza, espera, atención, alérgenos, otro) y gráfico de los más repetidos.
 
-- escaneos, NFC frente a QR, clics a Google, reseñas nuevas y su nota media frente a la histórica,
-- % de reseñas respondidas y tiempo medio de respuesta,
-- escaneos por día, por local y por mesa,
-- reseñas nuevas con botón **Responder** (propone una respuesta según las estrellas, lista para copiar),
-- mensajes privados.
+Sin contador, los datos salen de `js/datos-demo.js`: 30 días simulados con una semilla fija. Para forzar el ejemplo aunque haya contador, añade `?demo=1` (útil en la presentación).
 
-### Actualizar los datos reales
+### Informe mensual (`informe.html`)
 
-Hasta la fase 2, cambia a mano en `config.js` los números de cada local (ficha de Google Maps → *Reseñas*). En la fase 2, la API del Perfil de Empresa los actualiza a diario y permite responder desde el panel.
+Son 2 páginas A4 con la reputación real por local:
+- nota, % de 1★, objetivos y puesto en su zona,
+- las prioridades,
+- la actividad de las placas: KPI, embudo, hora punta y temas de queja.
 
-### Envío por WhatsApp (ya funciona)
+Se abre desde el panel; pulsa **Imprimir / Guardar PDF**. Con `?local=alfafar` sale solo ese local.
 
-Al enviar la queja o la solicitud de grupo se abre WhatsApp en el móvil del cliente con el mensaje ya redactado, hacia el número de `contacto.whatsapp`. El cliente solo pulsa «Enviar». El mensaje llega siempre en español aunque el cliente use la página en inglés (se añade «Idioma del cliente: inglés»). Incluye el local, la mesa, si entró por NFC o por QR, y en los grupos el presupuesto orientativo.
+### Actualizar los datos reales de Google
+
+Hasta la fase 2, cambia a mano en `config.js` los números de cada local:
+- **reseñas por estrellas y temas:** ficha de Google Maps → *Reseñas*,
+- **competencia:** búsqueda «buffet libre cerca de…» en Google Maps.
+
+En la fase 2, la API del Perfil de Empresa de Google los actualiza a diario y permite leer y responder cada reseña desde el panel.
+
+### Envío por WhatsApp (opcional)
+
+Si `contacto.whatsapp` tiene un número (ahora está vacío), al enviar la queja o la solicitud de grupo se abre WhatsApp en el móvil del cliente con el mensaje ya redactado hacia ese número. El cliente solo pulsa «Enviar». El mensaje llega siempre en español aunque el cliente use la página en inglés (se añade «Idioma del cliente: inglés»). Incluye el local, la mesa, si entró por NFC o por QR, y en los grupos el presupuesto orientativo.
 
 - No necesita servidor ni cuenta de WhatsApp Business. El que envía es el propio cliente.
 - La queja deja de ser anónima: el restaurante ve el número de WhatsApp del cliente. La página lo indica («te contestará por WhatsApp»).
 - El número configurado queda visible en el código de la página publicada. Para producción, usad el WhatsApp del restaurante, no uno personal.
 - Para probarlo desde el ordenador, abre `index.html`: se abre WhatsApp Web o Desktop. Si escribes a tu propio número, el mensaje aparece en el chat contigo mismo.
 
-### Contador real (fase 2, no implementado)
+### Contador real con Google Sheets (listo para activar)
 
-La página ya llama a una función `track(evento, datos)` en `js/app.js`. Ahora mismo no envía nada porque `CONFIG.contador.endpoint` está vacío. Los eventos que registra son `escaneo`, `clic_google`, `clic_platos`, `abrir_*`, `queja` y `grupo`, cada uno con el local, la mesa, el canal (`nfc`/`qr`) y la hora.
+Cada escaneo, clic y mensaje se guarda en una hoja de Google, y el panel muestra esos datos reales. Es gratis y no necesita servidor. Se activa en unos 5 minutos:
 
-Hay dos opciones gratuitas para la fase 2:
+1. Con la cuenta de Google del restaurante, crea una **hoja de cálculo vacía** (por ejemplo «Neco · Contador»).
+2. **Extensiones → Apps Script.** Borra lo que haya, pega el contenido de `tools/apps-script/Codigo.gs` y cambia:
+   - `CLAVE_PANEL`: una contraseña para el panel (por ejemplo `neco-2026-xxxx`).
+   - `EMAIL_AVISOS` (opcional): el email que recibirá cada mensaje privado al momento.
+3. **Implementar → Nueva implementación → Tipo: Aplicación web.**
+   - *Ejecutar como:* **yo**.
+   - *Quién tiene acceso:* **cualquier usuario**. Es necesario para que la página pueda enviar los escaneos; los datos solo se leen con la clave.
+   - Autoriza los permisos que pide Google: escribir en tu hoja y, si pusiste email, enviar correos.
+4. Copia la **URL de la aplicación web** (termina en `/exec`) y pégala en `config.js` → `contador.endpoint`. Publica el cambio (commit y push).
+5. Abre el panel una vez con `panel.html?clave=TU_CLAVE`. El panel la recuerda en ese navegador. También puedes escribirla en el aviso que aparece en el panel.
 
-1. **Cloudflare Worker + D1 o KV** (plan gratuito: 100.000 peticiones al día).
-   - El Worker recibe el `navigator.sendBeacon` y suma contadores por día, local y mesa.
-   - Expone un `GET /resumen` que devuelve el mismo formato que `window.DEMO`.
-   - `panel.html` sustituye `datos-demo.js` por un `fetch` a ese resumen, protegido con una clave sencilla o con Cloudflare Access.
-2. **Google Apps Script + Google Sheets.**
-   - Un script publicado como aplicación web (`doPost`) añade una fila por evento a una hoja.
-   - Los formularios de queja y de grupos, además, envían un email al gerente o al responsable de eventos con `MailApp`.
-   - El panel lee la hoja mediante el `doGet` del script. Es lo más fácil de mantener para el restaurante.
+**Qué se guarda.** Cada fila de la hoja «Eventos» lleva:
+- fecha, evento (`escaneo`, `clic_google`, `abrir_*`, `ver_alergenos`, `queja`, `grupo`), local, mesa, canal (`nfc`/`qr`) e idioma;
+- además, en las quejas: el tema, el texto y el contacto (si el cliente lo deja);
+- y en las solicitudes de grupo: tipo, personas, importe, fecha y contacto.
 
-En los dos casos hay que añadir a los formularios una casilla de aceptación y el aviso de privacidad (RGPD), porque se recoge un contacto. Los escaneos no guardan datos personales.
+Con `contador.guardarMensajes: false` no se guardan textos ni contactos.
+
+**Lo que no puede medir el contador:** las reseñas que el cliente publica en Google y las respuestas. Eso llega en la fase 2 con la API del Perfil de Empresa. Mientras tanto, esos KPI aparecen como «fase 2».
+
+**Privacidad (RGPD).**
+- Los escaneos no contienen datos personales.
+- Si se guardan textos y contactos de las quejas, el restaurante es el responsable de ese dato. Conviene enlazar su política de privacidad en el formulario; la página ya indica «Tu mensaje solo lo ve el equipo de Neco».
+
+**Probarlo sin desplegar nada.** `tools/apps-script/ejemplo-respuesta.json` imita la respuesta del script. Para verla en local:
+1. Pon `endpoint: "tools/apps-script/ejemplo-respuesta.json"` en `config.js`.
+2. Abre `panel.html?clave=x`.
+3. Cuando termines, deja `endpoint` vacío otra vez.
+
+## 7 bis. Carta de alérgenos (`alergenos.html`)
+
+Se abre desde la página del cliente → *Alérgenos e intolerancias → Ver carta de alérgenos*.
+- El cliente marca lo que no puede tomar (los 14 alérgenos de declaración obligatoria) y, si quiere, «vegetariano» o «vegano».
+- Ve los platos aptos agrupados por categoría y, aparte, los no aptos con el motivo.
+- Por defecto también excluye los platos con trazas.
+- Funciona en ES/EN y recuerda la selección en el móvil.
+
+- Los platos y sus alérgenos están en **`js/carta.js`**. **Son datos de ejemplo:** cocina tiene que revisarlos antes de usarla con clientes.
+- Cuando estén revisados, pon la fecha en `revisada: "AAAA-MM-DD"`. El aviso ámbar «Carta de ejemplo» pasa a ser «Revisada por cocina el …».
+- Un plato que solo se sirve en algunos locales lleva `locales: ["ruzafa", "saler"]`.
 
 ---
 

@@ -84,10 +84,11 @@ window.CONFIG = {
     maxPersonas: 300,
   },
 
-  /* Contador de visitas (fase 2). Si se deja vacío, no se envía nada.
-     Ver README → "Contador real". */
+  /* Contador real (Google Sheets). Si endpoint está vacío, no se envía nada y el
+     panel usa datos de ejemplo. Ver README → "Contador real" y tools/apps-script/. */
   contador: {
-    endpoint: "",
+    endpoint: "",            // URL de la aplicación web de Apps Script (termina en /exec)
+    guardarMensajes: true,   // guarda también el texto de las quejas y solicitudes en la hoja
   },
 
   /* ---------------------------------------------------------------
@@ -127,6 +128,15 @@ window.CONFIG = {
         nota: 4.1, resenas: 3639, fecha: "2026-10-09",
         estrellas: { 5: 1835, 4: 948, 3: 436, 2: 193, 1: 227 },
         temas: [["paella", 236], ["fideuá", 28], ["buffet libre", 27], ["dulces", 25], ["saludable", 17], ["surtido", 17], ["precio fijo", 12], ["codillo", 12]],
+        // Competencia cercana (Google, 10/10/2026). Las cifras de más de 1.000 reseñas
+        // son aproximadas, porque Google las redondea ("6,8 mil").
+        competencia: [
+          { nombre: "Muerde La Pasta (Ribera)", nota: 4.0, resenas: 6800, tipo: "Buffet italiano", precio: "10-20 €" },
+          { nombre: "Dididaodao Buffet Fusión", nota: 4.3, resenas: 3200, tipo: "Buffet asiático", precio: "20-30 €" },
+          { nombre: "AOYAMA (Joaquín Costa)", nota: 4.2, resenas: 4000, tipo: "Buffet japonés", precio: "20-30 €" },
+          { nombre: "Restaurante Japonés KOBE", nota: 4.4, resenas: 1800, tipo: "Buffet japonés", precio: "20-30 €" },
+          { nombre: "Punk BBQ & Sushi", nota: 4.2, resenas: 1300, tipo: "Buffet", precio: "20-30 €" },
+        ],
       },
       mesas: 45,
     },
@@ -150,6 +160,13 @@ window.CONFIG = {
         nota: 4.0, resenas: 4262, fecha: "2026-10-09",
         estrellas: { 5: 2001, 4: 1106, 3: 574, 2: 253, 1: 328 },
         temas: [["paella", 301], ["fideuá", 45], ["centro comercial", 32], ["Ciencias", 17], ["buffet libre", 16], ["Oceanogràfic", 12], ["codillo", 12], ["precio fijo", 10], ["natillas", 10], ["arroz al horno", 9]],
+        // Competencia cercana (Google, 10/10/2026). Las cifras de más de 1.000 reseñas
+        // son aproximadas, porque Google las redondea ("6,8 mil").
+        competencia: [
+          { nombre: "Muerde la Pasta (CC El Saler)", nota: 3.9, resenas: 4400, tipo: "Buffet italiano", precio: "10-20 €" },
+          { nombre: "Kamado Asian Food (CC El Saler)", nota: 4.3, resenas: 2100, tipo: "Asiático", precio: "20-30 €" },
+          { nombre: "WOK XIAO buffet libre", nota: 4.4, resenas: 1900, tipo: "Buffet asiático", precio: "10-20 €" },
+        ],
       },
       mesas: 50,
     },
@@ -173,6 +190,15 @@ window.CONFIG = {
         nota: 4.0, resenas: 1803, fecha: "2026-10-09",
         estrellas: { 5: 763, 4: 535, 3: 305, 2: 91, 1: 109 },
         temas: [["paella", 92], ["fruta", 24], ["fideuá", 16], ["sabor", 9], ["surtido", 8], ["costillas", 8], ["económico", 8], ["saludable", 6], ["oferta", 6]],
+        // Competencia cercana (Google, 10/10/2026). Las cifras de más de 1.000 reseñas
+        // son aproximadas, porque Google las redondea ("6,8 mil").
+        competencia: [
+          { nombre: "Colonial Buffet Alfafar", nota: 3.9, resenas: 8400, tipo: "Buffet", precio: "20-30 €" },
+          { nombre: "Asador City Wok Alfafar", nota: 3.8, resenas: 6400, tipo: "Buffet wok", precio: "20-30 €" },
+          { nombre: "SushiTok Alfafar", nota: 4.2, resenas: 2700, tipo: "Buffet japonés", precio: "20-30 €" },
+          { nombre: "Amazing Dinosaurios Buffet", nota: 4.1, resenas: 1500, tipo: "Buffet asiático", precio: "20-30 €" },
+          { nombre: "Kaisen Experience Alfafar", nota: 4.3, resenas: 1100, tipo: "Buffet japonés", precio: "20-30 €" },
+        ],
       },
       mesas: 40,
     },
@@ -200,6 +226,14 @@ window.CONFIG = {
         nota: 4.0, resenas: 732, fecha: "2026-10-09",
         estrellas: { 5: 306, 4: 238, 3: 124, 2: 38, 1: 26 },
         temas: [["bocadillos", 19], ["paella", 15], ["Parque Tecnológico", 12], ["peso", 8], ["pescado", 6], ["buffet libre", 5], ["saludable", 5]],
+        // Competencia cercana (Google, 10/10/2026). Las cifras de más de 1.000 reseñas
+        // son aproximadas, porque Google las redondea ("6,8 mil").
+        competencia: [
+          { nombre: "Restaurante Esteban Montesinos", nota: 4.2, resenas: 852, tipo: "Menú del día", precio: "20-30 €" },
+          { nombre: "La terraza del parque", nota: 4.2, resenas: 471, tipo: "Cocina valenciana", precio: "10-20 €" },
+          { nombre: "Restaurante De Lucas", nota: 4.5, resenas: 405, tipo: "Cocina valenciana", precio: "10-20 €" },
+          { nombre: "Restaurante Norte cafetería", nota: 4.1, resenas: 236, tipo: "Menú del día", precio: "10-30 €" },
+        ],
       },
       mesas: 60,
     },
