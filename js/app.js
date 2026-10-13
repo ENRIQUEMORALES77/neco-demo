@@ -53,6 +53,7 @@
     escudo: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6z"/><path d="M12 8v5M12 16.2v.1"/></svg>',
     tarta: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 21h16M5 21v-6.5A2.5 2.5 0 0 1 7.5 12h9a2.5 2.5 0 0 1 2.5 2.5V21"/><path d="M5 16.5c1.2.9 2.6.9 3.8 0s2.6-.9 3.7 0 2.6.9 3.7 0 2.6-.9 2.8 0M12 12V9M12 6.6c.9-.8.9-1.8 0-2.8-.9 1-.9 2 0 2.8z"/></svg>',
     reloj: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>',
+    euro: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.5 7.2A6.5 6.5 0 1 0 17.5 16.8"/><path d="M5 10.5h8.5M5 13.5h8.5"/></svg>',
     pin: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.2a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.8" r="2.5"/></svg>',
     chevron: '<span class="chevron"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></span>',
     check: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
@@ -172,6 +173,7 @@
     var l = C.locales[estado.localId], e = textoEstado(l);
     var chips = '<span class="chip ' + (e.abierto ? "" : "cerrado") + '"><span class="punto"></span>' + esc(e.txt) + '</span>';
     if (estado.mesa) chips = '<span class="chip">' + T("mesa") + " " + esc(estado.mesa) + '</span>' + chips;
+    if (l.destacado) chips += '<span class="chip">' + esc(L(l.destacado)) + '</span>';
 
     var html = '' +
       '<section class="hero" style="background-image:url(\'' + l.imagen + '\')">' +
@@ -188,6 +190,8 @@
         '<p class="aviso-enlace">' + N.fmt(T("resenaAviso"), { local: esc(l.nombre) }) + '</p>' +
       '</section>' +
 
+      htmlVisita(l) +
+
       '<nav class="accesos" aria-label="Más opciones">' +
         acceso("queja", I.chat, T("queja"), T("quejaSub"), htmlQueja(), "terracota") +
         '<div class="acceso"><a class="fila" id="btn-platos" href="' + C.enlaces.platos + '" target="_blank" rel="noopener">' +
@@ -198,6 +202,7 @@
         acceso("alergenos", I.escudo, T("alergenos"), T("alergenosSub"),
           '<p>' + T("alergenosTexto") + '</p>' +
           '<a class="boton secundario" id="btn-alergenos" href="alergenos.html?local=' + estado.localId + '&lang=' + estado.lang + '">' + I.escudo.replace('<svg', '<svg style="width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8"') + T("alergenosVer") + '</a>') +
+        acceso("precios", I.euro, T("precios"), T("preciosSub"), htmlPrecios(l)) +
         acceso("grupos", I.tarta, T("grupos"), T("gruposSub"), '<div id="grupo-cont"></div>', "terracota") +
         acceso("horario", I.reloj, T("horario"), esc(l.direccion), htmlHorario(l)) +
       '</nav>' +
@@ -217,7 +222,55 @@
       '<div class="panel-interior">' + interior + '</div></details>';
   }
 
-  /* ---------- horario ---------- */
+  /* ---------- tu visita: precio de hoy, horario, aparcamiento y transporte ---------- */
+  function tarifasLocal(l) { return Object.assign({}, C.tarifas, l.tarifas || {}); }
+
+  /* Hoy o, si hoy no abre, el próximo día que abre */
+  function proximoDiaAbierto(l) {
+    var hoy = N.ahoraMadrid().iso;
+    for (var i = 0; i < 15; i++) {
+      var iso = N.sumarDias(hoy, i);
+      if (N.franjasFecha(l, iso).length) return { iso: iso, hoy: i === 0 };
+    }
+    return { iso: hoy, hoy: true };
+  }
+
+  function htmlVisita(l) {
+    var t = tarifasLocal(l), d = proximoDiaAbierto(l), td = N.tipoDia(d.iso);
+    var precio = td === "laborable" ? t.adultoLaborable : t.adultoFinde;
+    var etqPrecio = d.hoy ? T("precioHoy") : N.fmt(T("precioDia"), { dia: T("dias")[N.fechaDeIso(d.iso).getDay()].toLowerCase() });
+    var franjas = N.franjasFecha(l, N.ahoraMadrid().iso).map(function (f) { return f.de + "–" + f.a; });
+    var ll = l.llegar || {};
+    var transporte = ll.metro ? "🚇 " + L(ll.metro) : ll.bus ? "🚌 " + L(ll.bus) : ll.tren ? "🚆 " + L(ll.tren) : T("comoLlegar");
+    var tiles = [
+      { abre: "precios", ico: "💶", et: etqPrecio, val: N.eur(precio, estado.lang), sub: T("porAdulto") + " · " + T("tarifa_" + td) },
+      { abre: "horario", ico: "🕐", et: T("horarioHoy"), val: franjas.length ? franjas[franjas.length - 1].split("–")[1] : "—", sub: franjas.length ? franjas.join(" · ") : T("cerradoHoy"), valPre: franjas.length ? T("hasta") + " " : "" },
+    ];
+    if (ll.parking) tiles.push({ abre: "horario", ico: "🅿️", et: T("aparcamiento"), val: L(ll.parking.corto), sub: "" , txt: true });
+    tiles.push({ abre: "horario", ico: "📍", et: T("comoLlegar"), val: transporte, sub: "", txt: true });
+    return '<section class="visita" aria-label="' + N.fmt(T("tuVisita"), { local: esc(l.nombre) }) + '">' +
+      tiles.map(function (x) {
+        return '<button type="button" class="v-tile' + (x.txt ? " v-txt" : "") + '" data-abrir="' + x.abre + '">' +
+          '<span class="v-et"><span aria-hidden="true">' + x.ico + '</span> ' + esc(x.et) + '</span>' +
+          '<span class="v-val">' + (x.valPre ? '<small>' + esc(x.valPre) + '</small>' : '') + esc(x.val) + '</span>' +
+          (x.sub ? '<span class="v-sub">' + esc(x.sub) + '</span>' : '') + '</button>';
+      }).join("") + '</section>';
+  }
+
+  function htmlPrecios(l) {
+    var t = tarifasLocal(l), hoy = N.tipoDia(proximoDiaAbierto(l).iso);
+    var abreFinde = l.horario.some(function (f) { return f.dias.indexOf(0) !== -1 || f.dias.indexOf(6) !== -1; });
+    var filas = [[T("pAdultoLab"), t.adultoLaborable, hoy === "laborable"]];
+    if (abreFinde) filas.push([T("pAdultoFinde"), t.adultoFinde, hoy !== "laborable"]);
+    filas.push([T("pN105"), t.nino105, false], [T("pN140"), t.nino140, false]);
+    return '<table class="horario precios">' + filas.map(function (f) {
+      return '<tr class="' + (f[2] ? "hoy" : "") + '"><td>' + esc(f[0]) + (f[2] ? ' <span class="tag-hoy">' + T("hoy") + '</span>' : '') + '</td><td><b>' + N.eur(f[1], estado.lang) + '</b></td></tr>';
+    }).join("") + '</table>' +
+      '<div class="nota-suave">' + T("pNota") + '</div>' +
+      (l.notaPrecios ? '<div class="nota-suave" style="margin-top:8px">' + esc(L(l.notaPrecios)) + '</div>' : '');
+  }
+
+  /* ---------- horario, cómo llegar y servicios ---------- */
   function htmlHorario(l) {
     var hoy = N.ahoraMadrid().dow, orden = [1, 2, 3, 4, 5, 6, 0];
     var filas = orden.map(function (d) {
@@ -228,7 +281,23 @@
       (l.notaHorario ? '<div class="nota-suave">' + esc(L(l.notaHorario)) + '</div>' : '') +
       '<div class="direccion"><span class="icono">' + I.pin + '</span><span>' + esc(l.direccion) + '</span></div>' +
       '<a class="boton secundario" href="' + l.maps + '" target="_blank" rel="noopener">' + T("comoLlegar") + '</a>' +
-      '<p style="margin:12px 0 0;font-size:13.5px;color:var(--tinta-3)">' + T("sinReserva") + '</p>';
+      htmlLlegar(l) +
+      '<h3 class="sub-h">' + T("servicios") + '</h3><ul class="info-filas">' +
+        (C.servicios || []).map(function (x) { return '<li><span aria-hidden="true">' + x.ico + '</span><span>' + esc(L(x)) + '</span></li>'; }).join("") +
+      '</ul>';
+  }
+
+  function htmlLlegar(l) {
+    var ll = l.llegar || {}, filas = [];
+    if (ll.metro) filas.push(["🚇", T("metro"), L(ll.metro)]);
+    if (ll.bus) filas.push(["🚌", T("bus"), L(ll.bus)]);
+    if (ll.tren) filas.push(["🚆", T("tren"), L(ll.tren)]);
+    if (ll.parking) filas.push(["🅿️", T("aparcamiento"), L(ll.parking.texto)]);
+    filas.push(["♿", T("accesibilidad"), l.accesibilidad ? L(l.accesibilidad) : N.fmt(T("accesoSinDato"), { tel: C.contacto.telefono })]);
+    if (ll.cerca) filas.push(["📍", T("cerca"), L(ll.cerca)]);
+    return '<ul class="info-filas">' + filas.map(function (f) {
+      return '<li><span aria-hidden="true">' + f[0] + '</span><span><b>' + esc(f[1]) + '</b> ' + esc(f[2]) + '</span></li>';
+    }).join("") + '</ul>';
   }
 
   /* ---------- queja privada ---------- */
@@ -460,6 +529,14 @@
     if (e.target.closest("#btn-google")) track("clic_google");
     if (e.target.closest("#btn-platos")) track("clic_platos");
     if (e.target.closest("#btn-alergenos")) track("ver_alergenos");
+
+    var ab = e.target.closest("[data-abrir]");
+    if (ab) {
+      var det = document.getElementById("d-" + ab.getAttribute("data-abrir"));
+      if (det) { det.open = true; det.scrollIntoView({ behavior: "smooth", block: "start" }); }
+      track("ver_" + ab.getAttribute("data-abrir"));
+      return;
+    }
 
     var cat = e.target.closest("[data-cat]");
     if (cat) {

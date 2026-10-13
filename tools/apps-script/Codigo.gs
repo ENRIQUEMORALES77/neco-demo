@@ -18,7 +18,8 @@ var CLAVE_PANEL = 'cambia-esta-clave';          // la pide el panel para leer lo
 var EMAIL_AVISOS = '';                           // si pones un email, recibe cada mensaje privado al momento
 var LOCALES = ['ruzafa', 'saler', 'alfafar', 'paterna'];
 var EVENTOS = ['escaneo', 'clic_google', 'clic_platos', 'abrir_queja', 'abrir_alergenos',
-               'abrir_grupos', 'abrir_horario', 'queja', 'grupo', 'ver_alergenos'];
+               'abrir_grupos', 'abrir_horario', 'abrir_precios', 'ver_precios', 'ver_horario',
+               'queja', 'grupo', 'ver_alergenos'];
 var DIAS_PANEL = 90;                             // días que se envían al panel
 // -------------------------------------------------------------------
 

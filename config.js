@@ -75,6 +75,14 @@ window.CONFIG = {
     "2027-12-25",
   ],
 
+  /* Servicios comunes a todos los locales (necobuffet.com) */
+  servicios: [
+    { ico: "🍽", es: "Más de 200 platos mediterráneos que rotan cada día", en: "Over 200 Mediterranean dishes, changing every day" },
+    { ico: "🌱", es: "Opciones vegetarianas y sin gluten", en: "Vegetarian and gluten-free options" },
+    { ico: "🛵", es: "También a domicilio con Glovo y Uber Eats", en: "Also delivered via Glovo and Uber Eats" },
+    { ico: "🪑", es: "Sin reserva: por orden de llegada", en: "No booking needed: first come, first served" },
+  ],
+
   /* Formulario de grupos y celebraciones */
   eventos: {
     tipos: ["cumpleanos", "comunion", "bautizo", "boda", "empresa", "grupo", "otro"],
@@ -107,6 +115,10 @@ window.CONFIG = {
        temas más mencionados). Los usan el panel y la presentación. Actualizar a mano
        hasta la fase 2 (API del Perfil de Empresa).
      · whatsapp (opcional): número propio del local; si no, se usa contacto.whatsapp.
+     · llegar: metro, bus, tren, parking { corto, texto } y cerca (texto o null si no aplica).
+     · accesibilidad: texto sobre acceso adaptado; null = «pregunta al personal».
+     · cierres (opcional): periodos de vacaciones [[desde, hasta], ...].
+     · destacado / notaPrecios (opcionales): una frase para la cabecera / bajo los precios.
      --------------------------------------------------------------- */
   locales: {
     ruzafa: {
@@ -121,9 +133,18 @@ window.CONFIG = {
       imagen: "img/ruzafa.webp",
       horario: [
         { dias: [0,1,2,3,4,5,6], servicio: "comida", de: "13:00", a: "16:30" },
-        { dias: [0,1,2,3,4,5,6], servicio: "cena",   de: "20:00", a: "23:30" },
+        { dias: [0,1,2,3,4],     servicio: "cena",   de: "20:00", a: "23:00" },
+        { dias: [5,6],           servicio: "cena",   de: "20:00", a: "23:30" },
       ],
-      notaHorario: { es: "La cena cierra a las 23:00 o 23:30 según el día.", en: "Dinner closes at 11 pm or 11:30 pm depending on the day." },
+      llegar: {
+        metro: { es: "Colón o Xàtiva (líneas 3 y 5)", en: "Colón or Xàtiva (lines 3 & 5)" },
+        bus: "6, 8, 9, 10, 13, 15, 19, 28, 35, 62, 71, 81",
+        tren: { es: "Estación del Norte, a 200 m", en: "Estación del Norte, 200 m away" },
+        parking: { corto: { es: "Parkings públicos cerca", en: "Public car parks nearby" },
+                   texto: { es: "Hay aparcamientos públicos en la zona centro.", en: "There are public car parks around the city centre." } },
+        cerca: { es: "Plaza del Ayuntamiento, teatros y comercios del centro", en: "Plaza del Ayuntamiento, theatres and city-centre shops" },
+      },
+      accesibilidad: null,   // a confirmar con el local (acceso en silla de ruedas, aseo adaptado)
       google: {   // dato real de Google Maps (09/10/2026)
         nota: 4.1, resenas: 3639, fecha: "2026-10-09",
         estrellas: { 5: 1835, 4: 948, 3: 436, 2: 193, 1: 227 },
@@ -153,9 +174,19 @@ window.CONFIG = {
       imagen: "img/saler.webp",
       horario: [
         { dias: [0,1,2,3,4,5,6], servicio: "comida", de: "13:00", a: "16:30" },
-        { dias: [0,1,2,3,4,5,6], servicio: "cena",   de: "20:00", a: "23:30" },
+        { dias: [0,1,2,3,4],     servicio: "cena",   de: "20:00", a: "23:00" },
+        { dias: [5,6],           servicio: "cena",   de: "20:00", a: "23:30" },
       ],
-      notaHorario: { es: "La cena cierra a las 23:00 o 23:30 según el día.", en: "Dinner closes at 11 pm or 11:30 pm depending on the day." },
+      destacado: { es: "El primer Neco · desde 1995", en: "The first Neco · since 1995" },
+      llegar: {
+        metro: null,
+        bus: "13, 14, 15, 35, 95 y Orbital",
+        tren: null,
+        parking: { corto: { es: "Gratis tardes y fines de semana", en: "Free evenings & weekends" },
+                   texto: { es: "Aparcamiento gratuito por las tardes y los fines de semana.", en: "Free parking in the evenings and at weekends." } },
+        cerca: { es: "A un minuto de la Ciudad de las Artes y las Ciencias y de la Ciudad de la Justicia", en: "One minute from the City of Arts and Sciences" },
+      },
+      accesibilidad: null,
       google: {   // dato real de Google Maps (09/10/2026)
         nota: 4.0, resenas: 4262, fecha: "2026-10-09",
         estrellas: { 5: 2001, 4: 1106, 3: 574, 2: 253, 1: 328 },
@@ -183,9 +214,18 @@ window.CONFIG = {
       imagen: "img/alfafar.webp",
       horario: [
         { dias: [0,1,2,3,4,5,6], servicio: "comida", de: "13:15", a: "16:30" },
-        { dias: [0,6],           servicio: "cena",   de: "20:00", a: "23:00" },
+        { dias: [5,6],           servicio: "cena",   de: "20:00", a: "23:00" },
       ],
-      notaHorario: { es: "Cenas solo sábados y domingos.", en: "Dinner on Saturdays and Sundays only." },
+      notaHorario: { es: "Cenas solo viernes y sábado.", en: "Dinner on Fridays and Saturdays only." },
+      llegar: {
+        metro: null,
+        bus: { es: "Línea Sedaví – Valencia", en: "Sedaví – Valencia line" },
+        tren: null,
+        parking: { corto: { es: "Gratis en el centro comercial", en: "Free at the shopping centre" },
+                   texto: { es: "Aparcamiento gratuito en el centro comercial Parque Albufera.", en: "Free parking at Parque Albufera shopping centre." } },
+        cerca: { es: "MN4, Ikea, Carrefour, Media Markt y Leroy Merlin", en: "MN4, Ikea, Carrefour, Media Markt and Leroy Merlin" },
+      },
+      accesibilidad: null,
       google: {   // dato real de Google Maps (09/10/2026)
         nota: 4.0, resenas: 1803, fecha: "2026-10-09",
         estrellas: { 5: 763, 4: 535, 3: 305, 2: 91, 1: 109 },
@@ -216,10 +256,21 @@ window.CONFIG = {
       horario: [
         { dias: [1,2,3,4,5], servicio: "comida", de: "07:30", a: "16:30" },
       ],
-      notaHorario: {
+      notaHorario: { es: "Cafetería y buffet. Cerrado del 25 de diciembre al 6 de enero.", en: "Café and buffet. Closed from 25 December to 6 January." },
+      cierres: [["2026-12-25", "2027-01-06"]],   // vacaciones (AAAA-MM-DD, ambos incluidos)
+      notaPrecios: {
         es: "Trabajadores del Parque: buffet + bebida 15,00 € · con café 16,15 €. Neco para llevar: 14,50 €/kg.",
         en: "Technology Park staff: buffet + drink €15.00 · with coffee €16.15. Neco to go: €14.50/kg.",
       },
+      llegar: {
+        metro: null,
+        bus: { es: "Edetania 130 y 131 (desde Valencia) · 1 y 3 (desde Paterna)", en: "Edetania 130 & 131 (from Valencia) · 1 & 3 (from Paterna)" },
+        tren: null,
+        parking: { corto: { es: "2,5 h gratis", en: "2.5 h free" },
+                   texto: { es: "Aparcamiento gratuito 2,5 horas en el Centro de Negocios Destro.", en: "2.5 hours of free parking at Destro Business Centre." } },
+        cerca: { es: "Ciudad Deportiva del Valencia CF, Heron City y Kinépolis", en: "Valencia CF training ground, Heron City and Kinépolis" },
+      },
+      accesibilidad: null,
       espacioCelebraciones: true,   // comuniones, bautizos, bodas, empresa
       cierraFestivos: true,         // SUPOSICIÓN (parque empresarial): confirmar con el local
       google: {   // dato real de Google Maps (09/10/2026)

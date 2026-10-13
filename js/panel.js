@@ -103,7 +103,6 @@
     }
     $("kpis-real").innerHTML = k.map(kpi).join("");
 
-    renderRecs(lista);
     renderHisto(a);
     renderComparativa();
     renderObjetivos();
@@ -118,16 +117,6 @@
 
   function kpi(x) {
     return '<div class="kpi' + (x[3] ? " kpi-" + x[3] : "") + '"><div class="k-et">' + x[0] + '</div><div class="k-val">' + x[1] + '</div><div class="k-sub">' + x[2] + '</div></div>';
-  }
-
-  var ICO_REC = { riesgo: "⚠", oportunidad: "🎯", competencia: "🏁", accion: "✔", info: "ℹ" };
-  var TXT_REC = { riesgo: "Riesgo", oportunidad: "Oportunidad", competencia: "Competencia", accion: "Acción", info: "Dato" };
-  function renderRecs(lista) {
-    var r = M.recomendaciones(D, lista);
-    $("recs").innerHTML = r.length ? r.map(function (x) {
-      return '<li class="rec rec-' + x.tipo + '"><span class="rec-ico" aria-hidden="true">' + ICO_REC[x.tipo] + '</span>' +
-        '<div><span class="rec-tipo">' + TXT_REC[x.tipo] + '</span><p>' + esc(x.texto) + '</p></div></li>';
-    }).join("") : '<li class="rec"><div><p>Sin alertas: todo en orden.</p></div></li>';
   }
 
   function renderHisto(a) {

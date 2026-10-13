@@ -13,13 +13,13 @@ Es todo HTML, CSS y JavaScript estático: no tiene servidor ni claves de API. Fu
 
 | Archivo | Para qué sirve |
 |---|---|
-| `index.html` | Página de destino (lo que ve el cliente). Se abre con `?local=ruzafa&mesa=12` |
+| `index.html` | Página de destino (lo que ve el cliente). Se abre con `?local=ruzafa&mesa=12`. Muestra la reseña en Google y, debajo, precio de hoy, horario, aparcamiento y cómo llegar |
 | `panel.html` | **Dashboard de reseñas**: reputación real en Google, competencia, prioridades automáticas y actividad de las placas |
 | `informe.html` | **Informe mensual** de 2 páginas A4 para imprimir o guardar en PDF (se abre desde el panel) |
 | `alergenos.html` | **Carta de alérgenos** con filtros por los 14 alérgenos y dieta (datos de ejemplo en `js/carta.js`) |
 | `presentacion.html` | **Modo presentación** para la reunión: móvil simulado, QR grande para que el gerente lo pruebe con su móvil y panel |
-| `expositor.html` | Plantilla imprimible del expositor de mesa A6, con un QR por local o por mesa |
-| `expositores-A6.pdf` / `expositores-4xA4.pdf` | Expositores de entrada de los 4 locales, listos para imprimir |
+| `expositor.html` | Generador de expositores: A6 de mesa, 4 por hoja A4 o **cartel A4 de entrada**, con estilo «Foto del local» (por defecto) o «Sencillo» |
+| `expositores-A6.pdf` / `expositores-4xA4.pdf` / `carteles-entrada-A4.pdf` | Expositores y carteles de entrada de los 4 locales, listos para imprimir |
 | `qr/*.svg`, `qr/*.png` | QR de cada local (entrada) |
 | `nfc-urls.csv` | La URL que hay que grabar en cada pegatina NFC (entrada + todas las mesas) |
 | `config.js` | **Toda** la configuración: locales, Place IDs, horarios, tarifas, festivos y enlaces |
@@ -281,6 +281,10 @@ Se abre desde la página del cliente → *Alérgenos e intolerancias → Ver car
 - **Fotos y logo:** web de Neco, optimizados en `img/`.
 
 ### A confirmar con Neco
+
+- **Accesibilidad (silla de ruedas, aseo adaptado):** su web no dice nada. Cuando lo confirméis, rellenad `accesibilidad` en cada local de `config.js`; mientras tanto, la página dice «pregunta al personal».
+- **Cenas de Alfafar:** la ficha del local en su web dice viernes y sábado; sus preguntas frecuentes, sábado y domingo. Se usa viernes y sábado, que coincide con Google.
+- **Apertura de Paterna:** su ficha dice 8:00; Google y las preguntas frecuentes, 7:30. Se usa 7:30.
 
 - **Paterna:**
   - `cierraFestivos: true` es una suposición, por ser un parque empresarial.

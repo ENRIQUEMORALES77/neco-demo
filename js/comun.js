@@ -67,6 +67,7 @@
   /* Franjas de una fecha concreta (tiene en cuenta los festivos) */
   function franjasFecha(local, iso) {
     if (local.cierraFestivos && C.festivos.indexOf(iso) !== -1) return [];
+    if ((local.cierres || []).some(function (c) { return iso >= c[0] && iso <= c[1]; })) return [];
     return franjasDia(local, fechaDeIso(iso).getDay());
   }
 
