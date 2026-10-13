@@ -63,7 +63,7 @@
     .f-local span { font-size: 7pt; letter-spacing: .1em; text-transform: uppercase; opacity: .9; }
 
     .f-card {
-      position: absolute; left: 6mm; right: 6mm; top: 50mm; bottom: 25mm; z-index: 2;
+      position: absolute; left: 6mm; right: 6mm; top: 50mm; bottom: 26mm; z-index: 2;
       background: #fff; border-radius: 5mm; box-shadow: 0 1.5mm 6mm rgba(40, 30, 10, .18);
       display: flex; flex-direction: column; align-items: center; padding: 4.5mm 5mm 4mm; text-align: center;
     }
@@ -71,7 +71,7 @@
     .f-titulo { font: 700 17pt/1.1 var(--serif); margin: 2mm 0 1mm; color: var(--tinta); }
     .f-sub { margin: 0; font-size: 8.2pt; color: var(--tinta-2); }
     .f-sub b { color: var(--verde-osc); }
-    .f-duo { display: grid; grid-template-columns: 1fr 1fr; gap: 4mm; align-items: center; margin-top: 6.5mm; width: 100%; }
+    .f-duo { display: grid; grid-template-columns: 1fr 1fr; gap: 4mm; align-items: center; margin-top: 5.3mm; width: 100%; }
     .f-nfc {
       position: relative; width: 31mm; height: 31mm; margin: 0 auto; border-radius: 50%;
       background: radial-gradient(circle at 35% 30%, #7E9483, var(--verde-osc) 60%, var(--verde-prof));
@@ -90,11 +90,10 @@
     .f-en { margin: auto 0 0; font: italic 500 7.4pt/1.3 var(--serif); color: var(--tinta-3); }
 
     .f-banda {
-      position: absolute; left: 0; right: 0; bottom: 0; height: 25mm; padding: 0 6mm; z-index: 1;
+      position: absolute; left: 0; right: 0; bottom: 0; height: 22mm; padding: 0 6mm; z-index: 1;
       display: flex; align-items: flex-end; padding-bottom: 4.2mm; justify-content: space-between; gap: 3mm;
       background: var(--verde-osc); color: #fff;
     }
-    .f-banda::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 1.2mm; background: var(--terracota); }
     .f-mesa { display: flex; align-items: center; gap: 2.4mm; }
     .f-mesa i {
       font-style: normal; width: 13mm; height: 13mm; border-radius: 50%; background: #fff; color: var(--verde-osc);
@@ -247,9 +246,9 @@
 
   <div class="hojas" id="hojas"></div>
 
-  <script src="config.js?v=15"></script>
-  <script src="js/comun.js?v=15"></script>
-  <script src="js/vendor/qrcode.js?v=15"></script>
+  <script src="config.js?v=17"></script>
+  <script src="js/comun.js?v=17"></script>
+  <script src="js/vendor/qrcode.js?v=17"></script>
   <script>
   (function () {
     var C = window.CONFIG, N = window.NECO;
