@@ -23,8 +23,15 @@
 
   function leerIdioma() {
     var p = (params.get("lang") || "").toLowerCase();
-    if (p === "es" || p === "en") return p;
-    try { var g = localStorage.getItem("neco-lang"); if (g === "es" || g === "en") return g; } catch (e) {}
+    if (p === "va") p = "ca";
+    if (window.I18N[p]) return p;
+    try { var g = localStorage.getItem("neco-lang"); if (window.I18N[g]) return g; } catch (e) {}
+    // Primera visita: idioma del móvil si lo tenemos (el valenciano/catalán incluido); si no, español
+    var nav = (navigator.languages || [navigator.language || ""]).map(function (x) { return String(x).slice(0, 2).toLowerCase(); });
+    for (var i = 0; i < nav.length; i++) {
+      if (nav[i] === "es") return "es";
+      if (window.I18N[nav[i]]) return nav[i];
+    }
     return "es";
   }
 
@@ -65,10 +72,10 @@
 
   /* ---------- utilidades de fecha ---------- */
   function fechaLarga(iso, lang) {
-    return new Intl.DateTimeFormat((lang || estado.lang) === "en" ? "en-GB" : "es-ES", { weekday: "long", day: "numeric", month: "long" }).format(N.fechaDeIso(iso));
+    return new Intl.DateTimeFormat(N.localeDe(lang || estado.lang), { weekday: "long", day: "numeric", month: "long" }).format(N.fechaDeIso(iso));
   }
   function ahoraTexto(lang) {
-    return new Intl.DateTimeFormat((lang || estado.lang) === "en" ? "en-GB" : "es-ES", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit", timeZone: "Europe/Madrid" }).format(new Date());
+    return new Intl.DateTimeFormat(N.localeDe(lang || estado.lang), { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit", timeZone: "Europe/Madrid" }).format(new Date());
   }
   var sumarDias = N.sumarDias;
 
@@ -116,7 +123,11 @@
     var hora = new Intl.DateTimeFormat("es-ES", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Madrid" }).format(new Date());
     return '<div class="ficha"><div class="ficha-cab">' + T("waFicha") + '</div><div class="burbuja-cont"><div class="burbuja">' + html + '<time>' + hora + '</time></div></div></div>';
   }
-  function notaIdioma() { return estado.lang === "es" ? "" : "\nIdioma del cliente: inglés"; }
+  function notaIdioma() {
+    if (estado.lang === "es") return "";
+    var i = window.IDIOMAS.filter(function (x) { return x.code === estado.lang; })[0];
+    return "\nIdioma del cliente: " + (i ? i.paraRestaurante : estado.lang);
+  }
 
   function textoWaQueja() {
     var q = estado.queja, l = C.locales[estado.localId];
@@ -480,9 +491,11 @@
   function render() {
     var t = window.I18N[estado.lang];
     document.documentElement.lang = t.htmlLang;
-    document.querySelectorAll(".idioma button").forEach(function (b) {
-      b.setAttribute("aria-pressed", String(b.getAttribute("data-lang") === estado.lang));
-    });
+    var selIdioma = document.getElementById("idioma");
+    if (selIdioma && !selIdioma.options.length) {
+      selIdioma.innerHTML = window.IDIOMAS.map(function (x) { return '<option value="' + x.code + '">' + x.corto + ' · ' + x.nombre + '</option>'; }).join("");
+    }
+    if (selIdioma) selIdioma.value = estado.lang;
     var pieLink = document.getElementById("cambiar-local");
     pieLink.textContent = t.cambiarLocal;
     pieLink.hidden = !estado.localId;
@@ -500,10 +513,8 @@
     renderGrupo();
   }
 
-  document.querySelector(".idioma").addEventListener("click", function (e) {
-    var b = e.target.closest("button[data-lang]");
-    if (!b || b.getAttribute("data-lang") === estado.lang) return;
-    estado.lang = b.getAttribute("data-lang");
+  document.getElementById("idioma").addEventListener("change", function (e) {
+    estado.lang = e.target.value;
     try { localStorage.setItem("neco-lang", estado.lang); } catch (err) {}
     render();
   });

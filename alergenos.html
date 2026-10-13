@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;1,500&display=swap">
-  <link rel="stylesheet" href="css/estilos.css?v=13">
+  <link rel="stylesheet" href="css/estilos.css?v=15">
   <style>
     .al-cab h1 { font: 600 27px/1.15 var(--serif); margin: 6px 0 2px; }
     .al-cab p { margin: 0; color: var(--tinta-2); }
@@ -60,17 +60,15 @@
 <body>
   <header class="barra">
     <a class="barra-logo" id="volver-logo" href="./" aria-label="Neco Buffet"><img src="img/logo-neco.png" alt="Neco Buffet" width="94" height="18"></a>
-    <div class="idioma" role="group" aria-label="Idioma / Language">
-      <button type="button" data-lang="es" aria-pressed="true">ES</button>
-      <button type="button" data-lang="en" aria-pressed="false">EN</button>
-    </div>
+    <label class="idioma-sel"><span class="sr">Idioma / Language</span><span aria-hidden="true">🌐</span><select id="idioma"></select></label>
   </header>
   <main class="contenido" id="al"></main>
   <footer class="pie"><a id="volver" href="./"></a><p id="pie-texto"></p></footer>
 
-  <script src="config.js?v=13"></script>
-  <script src="js/comun.js?v=13"></script>
-  <script src="js/carta.js?v=13"></script>
+  <script src="config.js?v=15"></script>
+  <script src="js/i18n.js?v=15"></script>
+  <script src="js/comun.js?v=15"></script>
+  <script src="js/carta.js?v=15"></script>
   <script>
   (function () {
     var C = window.CONFIG, K = window.CARTA, N = window.NECO;
@@ -92,13 +90,41 @@
         ejX: "Do not use it to decide what to eat: the kitchen confirms the real allergens. If in doubt, please ask our staff.",
         okT: "Checked by the kitchen on {f}", okX: "The buffet changes every day. If in doubt, please ask our staff before serving yourself.",
         volver: "Back", ninguno: "No dish matches your search.", vegTag: "Vegetarian", veganoTag: "Vegan", dietaNo: "not " },
+      ca: { titulo: "Carta d'al·lèrgens", que: "Què no pots prendre?", dieta: "Dieta", veg: "Vegetarià", vegano: "Vegà",
+        trazas: "Excloure també els plats que poden contindre traces", buscar: "Busca un plat…", aptos: "Pots prendre {n} de {t} plats",
+        todos: "Mostrant els {t} plats", limpiar: "Llevar filtres", noAptos: "No aptes per a tu ({n})", contiene: "Conté", puede: "Pot contindre",
+        sin: "Sense al·lèrgens de declaració obligatòria", motivo: "No apte: ", ejT: "Carta d'exemple per a la demostració",
+        ejX: "No la utilitzes per a decidir què menjar: els al·lèrgens reals els confirma la cuina. Davant de qualsevol dubte, consulta el personal.",
+        okT: "Revisada per la cuina el {f}", okX: "L'oferta del bufet canvia cada dia. Davant de qualsevol dubte, consulta el personal abans de servir-te.",
+        volver: "Tornar", ninguno: "Cap plat coincideix amb la cerca.", vegTag: "Vegetarià", veganoTag: "Vegà", dietaNo: "no és " },
+      fr: { titulo: "Carte des allergènes", que: "Que ne pouvez-vous pas manger ?", dieta: "Régime", veg: "Végétarien", vegano: "Végan",
+        trazas: "Exclure aussi les plats pouvant contenir des traces", buscar: "Rechercher un plat…", aptos: "Vous pouvez manger {n} plats sur {t}",
+        todos: "{t} plats affichés", limpiar: "Effacer les filtres", noAptos: "Ne vous conviennent pas ({n})", contiene: "Contient", puede: "Peut contenir",
+        sin: "Sans allergène à déclaration obligatoire", motivo: "Ne convient pas : ", ejT: "Carte d'exemple pour la démonstration",
+        ejX: "Ne l'utilisez pas pour choisir vos plats : la cuisine confirme les allergènes réels. En cas de doute, demandez au personnel.",
+        okT: "Vérifiée par la cuisine le {f}", okX: "Le buffet change chaque jour. En cas de doute, demandez au personnel avant de vous servir.",
+        volver: "Retour", ninguno: "Aucun plat ne correspond à la recherche.", vegTag: "Végétarien", veganoTag: "Végan", dietaNo: "pas " },
+      de: { titulo: "Allergenkarte", que: "Was dürfen Sie nicht essen?", dieta: "Ernährung", veg: "Vegetarisch", vegano: "Vegan",
+        trazas: "Auch Gerichte ausschließen, die Spuren enthalten können", buscar: "Gericht suchen…", aptos: "Sie können {n} von {t} Gerichten essen",
+        todos: "Alle {t} Gerichte", limpiar: "Filter löschen", noAptos: "Nicht geeignet für Sie ({n})", contiene: "Enthält", puede: "Kann enthalten",
+        sin: "Keine kennzeichnungspflichtigen Allergene", motivo: "Nicht geeignet: ", ejT: "Beispielkarte für die Demo",
+        ejX: "Nicht zur Entscheidung verwenden: Die tatsächlichen Allergene bestätigt die Küche. Fragen Sie im Zweifel das Personal.",
+        okT: "Von der Küche geprüft am {f}", okX: "Das Buffet wechselt täglich. Fragen Sie im Zweifel das Personal, bevor Sie sich bedienen.",
+        volver: "Zurück", ninguno: "Kein Gericht entspricht der Suche.", vegTag: "Vegetarisch", veganoTag: "Vegan", dietaNo: "nicht " },
+      it: { titulo: "Carta degli allergeni", que: "Cosa non puoi mangiare?", dieta: "Dieta", veg: "Vegetariano", vegano: "Vegano",
+        trazas: "Escludi anche i piatti che possono contenere tracce", buscar: "Cerca un piatto…", aptos: "Puoi mangiare {n} piatti su {t}",
+        todos: "Tutti i {t} piatti", limpiar: "Rimuovi filtri", noAptos: "Non adatti a te ({n})", contiene: "Contiene", puede: "Può contenere",
+        sin: "Senza allergeni a dichiarazione obbligatoria", motivo: "Non adatto: ", ejT: "Carta di esempio per la demo",
+        ejX: "Non usarla per decidere cosa mangiare: gli allergeni reali li conferma la cucina. In caso di dubbio, chiedi al personale.",
+        okT: "Verificata dalla cucina il {f}", okX: "Il buffet cambia ogni giorno. In caso di dubbio, chiedi al personale prima di servirti.",
+        volver: "Indietro", ninguno: "Nessun piatto corrisponde alla ricerca.", vegTag: "Vegetariano", veganoTag: "Vegano", dietaNo: "non è " },
     };
-    var lang = p.get("lang") === "en" || p.get("lang") === "es" ? p.get("lang") : (function () { try { return localStorage.getItem("neco-lang") || "es"; } catch (e) { return "es"; } })();
+    var lang = T[p.get("lang")] ? p.get("lang") : (function () { try { var g = localStorage.getItem("neco-lang"); return T[g] ? g : "es"; } catch (e) { return "es"; } })();
     var sel = leer(), dieta = "", conTrazas = true, texto = "";
     function leer() { try { return JSON.parse(localStorage.getItem(LS) || "[]"); } catch (e) { return []; } }
     function guardar() { try { localStorage.setItem(LS, JSON.stringify(sel)); } catch (e) {} }
     function t(k, v) { return N.fmt(T[lang][k], v); }
-    function nom(o) { return o[lang] || o.es; }
+    function nom(o) { return o[lang] || (lang === "ca" ? o.es : o.en) || o.es; }
     function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
 
     var platos = K.platos.filter(function (x) { return !x.locales || !localId || x.locales.indexOf(localId) !== -1; });
@@ -144,14 +170,16 @@
 
     function render() {
       document.documentElement.lang = lang;
-      document.querySelectorAll(".idioma button").forEach(function (b) { b.setAttribute("aria-pressed", String(b.getAttribute("data-lang") === lang)); });
+      var si = document.getElementById("idioma");
+      if (!si.options.length) si.innerHTML = window.IDIOMAS.map(function (x) { return '<option value="' + x.code + '">' + x.corto + ' · ' + x.nombre + '</option>'; }).join("");
+      si.value = lang;
       var l = localId ? C.locales[localId] : null, volver = localId ? "./?local=" + localId : "./";
       document.getElementById("volver").href = document.getElementById("volver-logo").href = volver;
       document.getElementById("volver").textContent = "← " + t("volver");
       document.getElementById("pie-texto").textContent = C.marca.pie;
       document.title = (l ? l.nombre : C.marca.nombre) + " · " + t("titulo");
       var aviso = K.revisada
-        ? '<div class="aviso-al ok"><span>✓</span><div><b>' + t("okT", { f: N.fechaDeIso(K.revisada).toLocaleDateString(lang === "en" ? "en-GB" : "es-ES") }) + '</b>' + t("okX") + '</div></div>'
+        ? '<div class="aviso-al ok"><span>✓</span><div><b>' + t("okT", { f: N.fechaDeIso(K.revisada).toLocaleDateString(N.localeDe(lang)) }) + '</b>' + t("okX") + '</div></div>'
         : '<div class="aviso-al ej"><span>⚠</span><div><b>' + t("ejT") + '</b>' + t("ejX") + '</div></div>';
       document.getElementById("al").innerHTML =
         '<div class="al-cab"><h1>' + t("titulo") + '</h1><p>' + esc(l ? l.nombre : C.marca.nombre) + '</p></div>' + aviso +
@@ -169,7 +197,7 @@
     }
 
     document.addEventListener("click", function (e) {
-      var a = e.target.closest("[data-al]"), d = e.target.closest("[data-dieta]"), lg = e.target.closest("[data-lang]");
+      var a = e.target.closest("[data-al]"), d = e.target.closest("[data-dieta]");
       if (a) {
         var k = a.getAttribute("data-al"), i = sel.indexOf(k);
         if (i === -1) sel.push(k); else sel.splice(i, 1);
@@ -180,11 +208,12 @@
         renderLista();
       } else if (e.target.id === "limpiar") {
         sel = []; dieta = ""; guardar(); render();
-      } else if (lg && lg.getAttribute("data-lang") !== lang) {
-        lang = lg.getAttribute("data-lang");
-        try { localStorage.setItem("neco-lang", lang); } catch (err) {}
-        render();
       }
+    });
+    document.getElementById("idioma").addEventListener("change", function (e) {
+      lang = e.target.value;
+      try { localStorage.setItem("neco-lang", lang); } catch (err) {}
+      render();
     });
     document.addEventListener("input", function (e) {
       if (e.target.id === "buscar") { texto = e.target.value; renderLista(); }

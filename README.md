@@ -18,12 +18,13 @@ Es todo HTML, CSS y JavaScript estático: no tiene servidor ni claves de API. Fu
 | `informe.html` | **Informe mensual** de 2 páginas A4 para imprimir o guardar en PDF (se abre desde el panel) |
 | `alergenos.html` | **Carta de alérgenos** con filtros por los 14 alérgenos y dieta (datos de ejemplo en `js/carta.js`) |
 | `presentacion.html` | **Modo presentación** para la reunión: móvil simulado, QR grande para que el gerente lo pruebe con su móvil y panel |
-| `expositor.html` | Generador de expositores: A6 de mesa, 4 por hoja A4 o **cartel A4 de entrada**, con estilo «Foto del local» (por defecto) o «Sencillo» |
-| `expositores-A6.pdf` / `expositores-4xA4.pdf` / `carteles-entrada-A4.pdf` | Expositores y carteles de entrada de los 4 locales, listos para imprimir |
+| `expositor.html` | **Kit de impresión**: expositor A6 de mesa, 4 por hoja A4, cartel A4 de entrada, pegatinas redondas de mesa (Ø 80 mm, 6 por A4), placa de caja (10 × 10 cm) y vinilo de puerta (A5) |
+| `expositores-A6.pdf`, `expositores-4xA4.pdf`, `carteles-entrada-A4.pdf`, `pegatinas-mesas.pdf`, `placas-caja.pdf`, `vinilos-puerta.pdf` | El kit completo de los 4 locales, listo para imprenta |
+| `privado/` | **No se publica** (está en `.gitignore`): propuesta comercial editable (`propuesta.html` → PDF) e imagen del expositor en una mesa |
 | `qr/*.svg`, `qr/*.png` | QR de cada local (entrada) |
 | `nfc-urls.csv` | La URL que hay que grabar en cada pegatina NFC (entrada + todas las mesas) |
 | `config.js` | **Toda** la configuración: locales, Place IDs, horarios, tarifas, festivos y enlaces |
-| `js/i18n.js` | Textos de la interfaz en español e inglés |
+| `js/i18n.js` | Textos de la interfaz en **6 idiomas**: español, valenciano, inglés, francés, alemán e italiano |
 | `tools/generar_qr.py` | Vuelve a generar los QR y `nfc-urls.csv` a partir de `config.js` |
 | `tools/apps-script/Codigo.gs` | **Contador real**: script de Google Apps Script para guardar escaneos, clics y mensajes en Google Sheets |
 | `js/metricas.js` | Cálculos compartidos por el panel y el informe (umbrales de nota, competencia, embudo, recomendaciones) |
@@ -46,7 +47,7 @@ Parámetros de la URL:
 | `local` | `ruzafa`, `saler`, `alfafar`, `paterna` | Elige el local. Si falta o no existe, se muestra un selector |
 | `mesa` | número | Muestra «Mesa 12» y queda registrado en los formularios |
 | `src` | `nfc` o `qr` | Indica por dónde ha entrado el cliente, para distinguirlo en el panel |
-| `lang` | `es` o `en` | Fuerza el idioma (por defecto, español). El botón ES/EN se recuerda en el móvil |
+| `lang` | `es`, `ca` (o `va`), `en`, `fr`, `de`, `it` | Fuerza el idioma. Sin él, la primera visita usa el idioma del móvil si es uno de estos y, si no, español. La elección del selector se recuerda en el móvil |
 
 ---
 
@@ -266,6 +267,35 @@ Se abre desde la página del cliente → *Alérgenos e intolerancias → Ver car
 - Un plato que solo se sirve en algunos locales lleva `locales: ["ruzafa", "saler"]`.
 
 ---
+
+## 7 ter. Idiomas
+
+- La página del cliente y la carta de alérgenos están en **español, valenciano, inglés, francés, alemán e italiano**. Arriba a la derecha hay un selector 🌐.
+- **Detección automática:** un móvil configurado en francés abre la página en francés. Uno en español, o en un idioma que no esté, la abre en español.
+- **Dónde está cada texto:**
+  - los de la interfaz, en `js/i18n.js` (un bloque por idioma; `IDIOMAS` define el orden del selector y el formato de fechas y precios);
+  - los de cada local (zona, aparcamiento, transporte, servicios…), en `config.js`, con las claves `es`, `en`, `ca`, `fr`, `de` e `it`;
+  - los de la carta, en `js/carta.js`.
+- **Si falta una traducción:** el valenciano usa el español y el resto de idiomas, el inglés.
+- **Los mensajes al restaurante** (WhatsApp) llegan siempre en español, con la nota «Idioma del cliente: francés», por ejemplo.
+
+## 7 quater. Kit de impresión y propuesta
+
+En `expositor.html` → **Formato**:
+
+| Pieza | Tamaño | Uso |
+|---|---|---|
+| Expositor de mesa | A6 (105 × 148 mm), suelto o 4 por A4 | En metacrilato sobre cada mesa. Estilo «Foto del local» o «Sencillo» |
+| Cartel de entrada | A4 | Recepción o pared de la entrada |
+| Pegatina redonda | Ø 80 mm, 6 por A4 | Directamente sobre la mesa. La pegatina NFC va debajo, en el centro |
+| Placa de caja | 100 × 100 mm | Mostrador o caja, sin número de mesa |
+| Vinilo de puerta | A5 (148 × 210 mm) | Cristal de la entrada, fondo blanco. Incluye los 6 idiomas |
+
+**Propuesta comercial:** abre `privado/propuesta.html` desde el servidor local (`python -m http.server 8080` → <http://localhost:8080/privado/propuesta.html>).
+- Calcula los datos reales de Google de cada local.
+- Los textos con fondo amarillo al pasar el ratón se editan ahí mismo: precios, contacto y local del piloto. Se guardan en ese navegador.
+- Después, **Imprimir → Guardar como PDF**. Hay una versión ya generada en `privado/propuesta-neco.pdf`, con los precios en blanco.
+- La carpeta `privado/` **no se sube a GitHub**, para que tus precios no queden públicos.
 
 ## 8. Datos tomados de necobuffet.com (revisados el 09/10/2026)
 

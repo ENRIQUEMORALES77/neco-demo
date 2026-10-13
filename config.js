@@ -23,7 +23,7 @@ window.CONFIG = {
 
   marca: {
     nombre: "Neco Buffet",
-    lema: { es: "Buffet libre mediterráneo", en: "Mediterranean all-you-can-eat buffet" },
+    lema: { es: "Buffet libre mediterráneo", en: "Mediterranean all-you-can-eat buffet", ca: "Bufet lliure mediterrani", fr: "Buffet méditerranéen à volonté", de: "Mediterranes All-you-can-eat-Buffet", it: "Buffet libero mediterraneo" },
     logo: "img/logo-neco.png",              // verde, para fondos claros
     logoBlanco: "img/logo-neco-blanco.png", // para fondos oscuros / fotos
     web: "https://necobuffet.com",
@@ -77,10 +77,10 @@ window.CONFIG = {
 
   /* Servicios comunes a todos los locales (necobuffet.com) */
   servicios: [
-    { ico: "🍽", es: "Más de 200 platos mediterráneos que rotan cada día", en: "Over 200 Mediterranean dishes, changing every day" },
-    { ico: "🌱", es: "Opciones vegetarianas y sin gluten", en: "Vegetarian and gluten-free options" },
-    { ico: "🛵", es: "También a domicilio con Glovo y Uber Eats", en: "Also delivered via Glovo and Uber Eats" },
-    { ico: "🪑", es: "Sin reserva: por orden de llegada", en: "No booking needed: first come, first served" },
+    { ico: "🍽", es: "Más de 200 platos mediterráneos que rotan cada día", en: "Over 200 Mediterranean dishes, changing every day", ca: "Més de 200 plats mediterranis que canvien cada dia", fr: "Plus de 200 plats méditerranéens qui changent chaque jour", de: "Über 200 mediterrane Gerichte, die täglich wechseln", it: "Oltre 200 piatti mediterranei che cambiano ogni giorno" },
+    { ico: "🌱", es: "Opciones vegetarianas y sin gluten", en: "Vegetarian and gluten-free options", ca: "Opcions vegetarianes i sense gluten", fr: "Options végétariennes et sans gluten", de: "Vegetarische und glutenfreie Optionen", it: "Opzioni vegetariane e senza glutine" },
+    { ico: "🛵", es: "También a domicilio con Glovo y Uber Eats", en: "Also delivered via Glovo and Uber Eats", ca: "També a domicili amb Glovo i Uber Eats", fr: "Aussi en livraison avec Glovo et Uber Eats", de: "Auch per Lieferung mit Glovo und Uber Eats", it: "Anche a domicilio con Glovo e Uber Eats" },
+    { ico: "🪑", es: "Sin reserva: por orden de llegada", en: "No booking needed: first come, first served", ca: "Sense reserva: per orde d'arribada", fr: "Sans réservation : par ordre d'arrivée", de: "Keine Reservierung: nach Ankunft", it: "Senza prenotazione: in ordine di arrivo" },
   ],
 
   /* Formulario de grupos y celebraciones */
@@ -124,7 +124,7 @@ window.CONFIG = {
     ruzafa: {
       nombre: "Neco Paseo de Ruzafa",
       corto: "Ruzafa",
-      zona: { es: "Centro de Valencia", en: "Valencia city centre" },
+      zona: { es: "Centro de Valencia", en: "Valencia city centre", ca: "Centre de València", fr: "Centre de Valence", de: "Zentrum von Valencia", it: "Centro di Valencia" },
       direccion: "Paseo de Ruzafa, 20 · 46002 Valencia",
       placeId: "ChIJm9_aorRIYA0RCtUoq7cHfe0",
       verificado: true,
@@ -137,12 +137,12 @@ window.CONFIG = {
         { dias: [5,6],           servicio: "cena",   de: "20:00", a: "23:30" },
       ],
       llegar: {
-        metro: { es: "Colón o Xàtiva (líneas 3 y 5)", en: "Colón or Xàtiva (lines 3 & 5)" },
+        metro: { es: "Colón o Xàtiva (líneas 3 y 5)", en: "Colón or Xàtiva (lines 3 & 5)", ca: "Colón o Xàtiva (línies 3 i 5)", fr: "Colón ou Xàtiva (lignes 3 et 5)", de: "Colón oder Xàtiva (Linien 3 und 5)", it: "Colón o Xàtiva (linee 3 e 5)" },
         bus: "6, 8, 9, 10, 13, 15, 19, 28, 35, 62, 71, 81",
-        tren: { es: "Estación del Norte, a 200 m", en: "Estación del Norte, 200 m away" },
-        parking: { corto: { es: "Parkings públicos cerca", en: "Public car parks nearby" },
-                   texto: { es: "Hay aparcamientos públicos en la zona centro.", en: "There are public car parks around the city centre." } },
-        cerca: { es: "Plaza del Ayuntamiento, teatros y comercios del centro", en: "Plaza del Ayuntamiento, theatres and city-centre shops" },
+        tren: { es: "Estación del Norte, a 200 m", en: "Estación del Norte, 200 m away", ca: "Estació del Nord, a 200 m", fr: "Gare du Nord (Estación del Norte), à 200 m", de: "Bahnhof Estación del Norte, 200 m entfernt", it: "Stazione del Nord, a 200 m" },
+        parking: { corto: { es: "Parkings públicos cerca", en: "Public car parks nearby", ca: "Aparcaments públics a prop", fr: "Parkings publics à proximité", de: "Öffentliche Parkhäuser in der Nähe", it: "Parcheggi pubblici vicini" },
+                   texto: { es: "Hay aparcamientos públicos en la zona centro.", en: "There are public car parks around the city centre.", ca: "Hi ha aparcaments públics a la zona centre.", fr: "Il y a des parkings publics dans le centre-ville.", de: "Im Zentrum gibt es öffentliche Parkhäuser.", it: "Ci sono parcheggi pubblici in centro." } },
+        cerca: { es: "Plaza del Ayuntamiento, teatros y comercios del centro", en: "Plaza del Ayuntamiento, theatres and city-centre shops", ca: "Plaça de l'Ajuntament, teatres i comerços del centre", fr: "Place de la Mairie, théâtres et boutiques du centre", de: "Rathausplatz, Theater und Geschäfte im Zentrum", it: "Piazza del Municipio, teatri e negozi del centro" },
       },
       accesibilidad: null,   // a confirmar con el local (acceso en silla de ruedas, aseo adaptado)
       google: {   // dato real de Google Maps (09/10/2026)
@@ -165,7 +165,7 @@ window.CONFIG = {
     saler: {
       nombre: "Neco CC El Saler",
       corto: "El Saler",
-      zona: { es: "Centro Comercial El Saler", en: "El Saler shopping centre" },
+      zona: { es: "Centro Comercial El Saler", en: "El Saler shopping centre", ca: "Centre Comercial El Saler", fr: "Centre commercial El Saler", de: "Einkaufszentrum El Saler", it: "Centro commerciale El Saler" },
       direccion: "CC El Saler (planta alta) · Av. Profesor López Piñero, 16 · 46013 Valencia",
       placeId: "ChIJ5W8TT-BKYA0R20eR7CG0ZQA",
       verificado: true,
@@ -177,14 +177,14 @@ window.CONFIG = {
         { dias: [0,1,2,3,4],     servicio: "cena",   de: "20:00", a: "23:00" },
         { dias: [5,6],           servicio: "cena",   de: "20:00", a: "23:30" },
       ],
-      destacado: { es: "El primer Neco · desde 1995", en: "The first Neco · since 1995" },
+      destacado: { es: "El primer Neco · desde 1995", en: "The first Neco · since 1995", ca: "El primer Neco · des de 1995", fr: "Le premier Neco · depuis 1995", de: "Das erste Neco · seit 1995", it: "Il primo Neco · dal 1995" },
       llegar: {
         metro: null,
         bus: "13, 14, 15, 35, 95 y Orbital",
         tren: null,
-        parking: { corto: { es: "Gratis tardes y fines de semana", en: "Free evenings & weekends" },
-                   texto: { es: "Aparcamiento gratuito por las tardes y los fines de semana.", en: "Free parking in the evenings and at weekends." } },
-        cerca: { es: "A un minuto de la Ciudad de las Artes y las Ciencias y de la Ciudad de la Justicia", en: "One minute from the City of Arts and Sciences" },
+        parking: { corto: { es: "Gratis tardes y fines de semana", en: "Free evenings & weekends", ca: "Gratis vesprades i caps de setmana", fr: "Gratuit le soir et le week-end", de: "Gratis abends und am Wochenende", it: "Gratis la sera e nel weekend" },
+                   texto: { es: "Aparcamiento gratuito por las tardes y los fines de semana.", en: "Free parking in the evenings and at weekends.", ca: "Aparcament gratuït per les vesprades i els caps de setmana.", fr: "Parking gratuit le soir et le week-end.", de: "Kostenloses Parken abends und am Wochenende.", it: "Parcheggio gratuito la sera e nel fine settimana." } },
+        cerca: { es: "A un minuto de la Ciudad de las Artes y las Ciencias y de la Ciudad de la Justicia", en: "One minute from the City of Arts and Sciences", ca: "A un minut de la Ciutat de les Arts i les Ciències i de la Ciutat de la Justícia", fr: "À une minute de la Cité des Arts et des Sciences", de: "Eine Minute von der Stadt der Künste und der Wissenschaften", it: "A un minuto dalla Città delle Arti e delle Scienze" },
       },
       accesibilidad: null,
       google: {   // dato real de Google Maps (09/10/2026)
@@ -205,7 +205,7 @@ window.CONFIG = {
     alfafar: {
       nombre: "Neco Alfafar",
       corto: "Alfafar",
-      zona: { es: "Alfafar", en: "Alfafar" },
+      zona: { es: "Alfafar", en: "Alfafar", ca: "Alfafar", fr: "Alfafar", de: "Alfafar", it: "Alfafar" },
       direccion: "CC Parque Albufera · Av. Reyes Católicos, s/n · 46910 Alfafar",
       placeId: "ChIJIbxNX7FOYA0R3XJooKz2h7Q",
       verificado: true,
@@ -216,14 +216,14 @@ window.CONFIG = {
         { dias: [0,1,2,3,4,5,6], servicio: "comida", de: "13:15", a: "16:30" },
         { dias: [5,6],           servicio: "cena",   de: "20:00", a: "23:00" },
       ],
-      notaHorario: { es: "Cenas solo viernes y sábado.", en: "Dinner on Fridays and Saturdays only." },
+      notaHorario: { es: "Cenas solo viernes y sábado.", en: "Dinner on Fridays and Saturdays only.", ca: "Sopars només divendres i dissabte.", fr: "Dîner uniquement le vendredi et le samedi.", de: "Abendessen nur freitags und samstags.", it: "Cena solo venerdì e sabato." },
       llegar: {
         metro: null,
-        bus: { es: "Línea Sedaví – Valencia", en: "Sedaví – Valencia line" },
+        bus: { es: "Línea Sedaví – Valencia", en: "Sedaví – Valencia line", ca: "Línia Sedaví – València", fr: "Ligne Sedaví – Valence", de: "Linie Sedaví – Valencia", it: "Linea Sedaví – Valencia" },
         tren: null,
-        parking: { corto: { es: "Gratis en el centro comercial", en: "Free at the shopping centre" },
-                   texto: { es: "Aparcamiento gratuito en el centro comercial Parque Albufera.", en: "Free parking at Parque Albufera shopping centre." } },
-        cerca: { es: "MN4, Ikea, Carrefour, Media Markt y Leroy Merlin", en: "MN4, Ikea, Carrefour, Media Markt and Leroy Merlin" },
+        parking: { corto: { es: "Gratis en el centro comercial", en: "Free at the shopping centre", ca: "Gratis al centre comercial", fr: "Gratuit au centre commercial", de: "Gratis im Einkaufszentrum", it: "Gratis al centro commerciale" },
+                   texto: { es: "Aparcamiento gratuito en el centro comercial Parque Albufera.", en: "Free parking at Parque Albufera shopping centre.", ca: "Aparcament gratuït al centre comercial Parque Albufera.", fr: "Parking gratuit au centre commercial Parque Albufera.", de: "Kostenloses Parken im Einkaufszentrum Parque Albufera.", it: "Parcheggio gratuito al centro commerciale Parque Albufera." } },
+        cerca: { es: "MN4, Ikea, Carrefour, Media Markt y Leroy Merlin", en: "MN4, Ikea, Carrefour, Media Markt and Leroy Merlin", ca: "MN4, Ikea, Carrefour, Media Markt i Leroy Merlin", fr: "MN4, Ikea, Carrefour, Media Markt et Leroy Merlin", de: "MN4, Ikea, Carrefour, Media Markt und Leroy Merlin", it: "MN4, Ikea, Carrefour, Media Markt e Leroy Merlin" },
       },
       accesibilidad: null,
       google: {   // dato real de Google Maps (09/10/2026)
@@ -246,7 +246,7 @@ window.CONFIG = {
     paterna: {
       nombre: "Neco Parque Tecnológico",
       corto: "Paterna",
-      zona: { es: "Parque Tecnológico · Paterna", en: "Technology Park · Paterna" },
+      zona: { es: "Parque Tecnológico · Paterna", en: "Technology Park · Paterna", ca: "Parc Tecnològic · Paterna", fr: "Parc technologique · Paterna", de: "Technologiepark · Paterna", it: "Parco Tecnologico · Paterna" },
       direccion: "Ronda Narcís Monturiol, 2 · 46980 Paterna",
       placeId: "ChIJIWJnxEBbYA0Rd4iO3dOSKp8",
       verificado: true,
@@ -256,19 +256,23 @@ window.CONFIG = {
       horario: [
         { dias: [1,2,3,4,5], servicio: "comida", de: "07:30", a: "16:30" },
       ],
-      notaHorario: { es: "Cafetería y buffet. Cerrado del 25 de diciembre al 6 de enero.", en: "Café and buffet. Closed from 25 December to 6 January." },
+      notaHorario: { es: "Cafetería y buffet. Cerrado del 25 de diciembre al 6 de enero.", en: "Café and buffet. Closed from 25 December to 6 January.", ca: "Cafeteria i bufet. Tancat del 25 de desembre al 6 de gener.", fr: "Cafétéria et buffet. Fermé du 25 décembre au 6 janvier.", de: "Café und Buffet. Vom 25. Dezember bis 6. Januar geschlossen.", it: "Caffetteria e buffet. Chiuso dal 25 dicembre al 6 gennaio." },
       cierres: [["2026-12-25", "2027-01-06"]],   // vacaciones (AAAA-MM-DD, ambos incluidos)
       notaPrecios: {
         es: "Trabajadores del Parque: buffet + bebida 15,00 € · con café 16,15 €. Neco para llevar: 14,50 €/kg.",
         en: "Technology Park staff: buffet + drink €15.00 · with coffee €16.15. Neco to go: €14.50/kg.",
+        ca: "Treballadors del Parc: bufet + beguda 15,00 € · amb café 16,15 €. Neco per a emportar: 14,50 €/kg.",
+        fr: "Salariés du Parc : buffet + boisson 15,00 € · avec café 16,15 €. Neco à emporter : 14,50 €/kg.",
+        de: "Mitarbeiter des Parks: Buffet + Getränk 15,00 € · mit Kaffee 16,15 €. Neco zum Mitnehmen: 14,50 €/kg.",
+        it: "Lavoratori del Parco: buffet + bevanda 15,00 € · con caffè 16,15 €. Neco da asporto: 14,50 €/kg.",
       },
       llegar: {
         metro: null,
-        bus: { es: "Edetania 130 y 131 (desde Valencia) · 1 y 3 (desde Paterna)", en: "Edetania 130 & 131 (from Valencia) · 1 & 3 (from Paterna)" },
+        bus: { es: "Edetania 130 y 131 (desde Valencia) · 1 y 3 (desde Paterna)", en: "Edetania 130 & 131 (from Valencia) · 1 & 3 (from Paterna)", ca: "Edetania 130 i 131 (des de València) · 1 i 3 (des de Paterna)", fr: "Edetania 130 et 131 (depuis Valence) · 1 et 3 (depuis Paterna)", de: "Edetania 130 und 131 (ab Valencia) · 1 und 3 (ab Paterna)", it: "Edetania 130 e 131 (da Valencia) · 1 e 3 (da Paterna)" },
         tren: null,
-        parking: { corto: { es: "2,5 h gratis", en: "2.5 h free" },
-                   texto: { es: "Aparcamiento gratuito 2,5 horas en el Centro de Negocios Destro.", en: "2.5 hours of free parking at Destro Business Centre." } },
-        cerca: { es: "Ciudad Deportiva del Valencia CF, Heron City y Kinépolis", en: "Valencia CF training ground, Heron City and Kinépolis" },
+        parking: { corto: { es: "2,5 h gratis", en: "2.5 h free", ca: "2,5 h gratis", fr: "2,5 h gratuites", de: "2,5 Std. gratis", it: "2,5 h gratis" },
+                   texto: { es: "Aparcamiento gratuito 2,5 horas en el Centro de Negocios Destro.", en: "2.5 hours of free parking at Destro Business Centre.", ca: "Aparcament gratuït 2,5 hores al Centre de Negocis Destro.", fr: "Parking gratuit 2,5 heures au centre d'affaires Destro.", de: "2,5 Stunden kostenloses Parken im Geschäftszentrum Destro.", it: "Parcheggio gratuito per 2,5 ore al Centro Affari Destro." } },
+        cerca: { es: "Ciudad Deportiva del Valencia CF, Heron City y Kinépolis", en: "Valencia CF training ground, Heron City and Kinépolis", ca: "Ciutat Esportiva del València CF, Heron City i Kinépolis", fr: "Centre d'entraînement du Valencia CF, Heron City et Kinépolis", de: "Trainingszentrum des Valencia CF, Heron City und Kinépolis", it: "Centro sportivo del Valencia CF, Heron City e Kinépolis" },
       },
       accesibilidad: null,
       espacioCelebraciones: true,   // comuniones, bautizos, bodas, empresa

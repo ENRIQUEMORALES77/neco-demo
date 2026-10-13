@@ -5,7 +5,8 @@
   function loc(v, lang) {
     if (v == null) return "";
     if (typeof v === "string") return v;
-    return v[lang] || v.es || "";
+    // Si falta la traducción: el valenciano usa el español; el resto, el inglés
+    return v[lang] || (lang === "ca" ? v.es : v.en) || v.es || "";
   }
 
   function fmt(str, vars) {
@@ -14,16 +15,21 @@
     });
   }
 
+  function localeDe(lang) {
+    var i = (window.IDIOMAS || []).filter(function (x) { return x.code === lang; })[0];
+    return i ? i.locale : lang === "en" ? "en-GB" : "es-ES";
+  }
+
   function eur(n, lang, decimales) {
     var d = decimales == null ? 2 : decimales;
-    return new Intl.NumberFormat(lang === "en" ? "en-IE" : "es-ES", {
+    return new Intl.NumberFormat(localeDe(lang), {
       style: "currency", currency: "EUR",
       minimumFractionDigits: d, maximumFractionDigits: d, useGrouping: "always",
     }).format(n);
   }
 
   function num(n, lang) {
-    return new Intl.NumberFormat(lang === "en" ? "en-IE" : "es-ES", { useGrouping: "always" }).format(n);
+    return new Intl.NumberFormat(localeDe(lang), { useGrouping: "always" }).format(n);
   }
 
   function aMin(hhmm) {
@@ -131,7 +137,7 @@
   }
 
   window.NECO = {
-    loc: loc, fmt: fmt, eur: eur, num: num, aMin: aMin, isoDe: isoDe, fechaDeIso: fechaDeIso,
+    loc: loc, fmt: fmt, eur: eur, localeDe: localeDe, num: num, aMin: aMin, isoDe: isoDe, fechaDeIso: fechaDeIso,
     ahoraMadrid: ahoraMadrid, tipoDia: tipoDia, franjasDia: franjasDia, franjasFecha: franjasFecha,
     sumarDias: sumarDias, abreServicio: abreServicio,
     estadoAhora: estadoAhora, presupuesto: presupuesto, urlResena: urlResena, urlLocal: urlLocal,
